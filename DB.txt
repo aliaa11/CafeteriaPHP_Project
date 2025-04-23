@@ -31,7 +31,7 @@ CREATE TABLE orders (
   user_id INT,
   item_id INT,
   quantity INT,
-  status ENUM('pending', 'confirmed', 'processing', 'canceled', 'delivered') DEFAULT 'pending',
+  status ENUM('confirmed', 'processing', 'canceled', 'delivered') DEFAULT 'pending',
   order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (item_id) REFERENCES items(id)
