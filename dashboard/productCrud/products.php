@@ -3,7 +3,7 @@
     if (!$myConnection) {
       die("Database connection failed");
   }
-  $items_per_page = 4; 
+  $items_per_page = 3; 
   $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
   if ($current_page < 1) $current_page = 1;
   $offset = ($current_page - 1) * $items_per_page;
@@ -61,6 +61,9 @@
                     </div>
                 </div>
             </div>
+            <button class="btn btn-success mt-4" type="button" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <i class="fas fa-plus me-2"></i>Add Product
+            </button>
             <input type="hidden" name="page" value="1">
         </form>
         <!-- display items -->
