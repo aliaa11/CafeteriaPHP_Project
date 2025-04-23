@@ -1,0 +1,46 @@
+/* Category table styling */
+.category-table {
+  width: 100%;
+}
+
+.category-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* Form styling */
+.category-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Action buttons */
+.btn-action {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Empty state */
+.empty-categories {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+}
+
+/* Search box */
+.search-box {
+  position: relative;
+}
+
+.search-box .search-icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+.search-box input {
+  padding-left: 3rem;
+}
