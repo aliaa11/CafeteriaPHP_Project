@@ -6,6 +6,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   $items_per_page = 6; 
   $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
 =======
@@ -21,6 +22,9 @@
 >>>>>>> c88e851 (update product done)
 =======
   $items_per_page = 4; 
+=======
+  $items_per_page = 3; 
+>>>>>>> d45f9fe (Product Crud Done for all requirment)
   $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 >>>>>>> eb043ea (Product Crud Done for all requirment)
   if ($current_page < 1) $current_page = 1;
@@ -353,6 +357,9 @@
 =======
 >>>>>>> 0d05dec (Product Crud Done for all requirment)
             </div>
+            <button class="btn btn-success mt-4" type="button" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <i class="fas fa-plus me-2"></i>Add Product
+            </button>
             <input type="hidden" name="page" value="1">
         </form>
         <!-- display items -->
