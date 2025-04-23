@@ -3,8 +3,8 @@
     if (!$myConnection) {
       die("Database connection failed");
   }
-  $items_per_page = 6; 
-  $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+  $items_per_page = 4; 
+  $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
   if ($current_page < 1) $current_page = 1;
   $offset = ($current_page - 1) * $items_per_page;
 ?>
@@ -73,8 +73,8 @@
             $count_sql = "SELECT COUNT(*) as total FROM items p 
                           LEFT JOIN categories c ON p.category_id = c.id";
             if (isset($_GET['search_term'])) {
-                $search_term = $_GET['search_term'];
-                $search_by = $_GET['search_by'] ?? 'name';
+                $search_term = mysqli_real_escape_string($myConnection, $_GET['search_term']);
+                $search_by = mysqli_real_escape_string($myConnection, $_GET['search_by'] ?? 'name');
                 if ($search_by === 'name') {
                     $sql .= " WHERE p.name LIKE '%$search_term%'";
                     $count_sql .= " WHERE p.name LIKE '%$search_term%'";
@@ -126,7 +126,11 @@
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<<<<<<< HEAD
                                         </div>
+=======
+                                                </div>
+>>>>>>> ba12532 (Product Crud Done for all requirment)
                                                 <div class="modal-body">
                                                     Are you sure you want to delete this product?
                                                 </div>
@@ -266,6 +270,7 @@ if(isset($_POST['addProduct'])) {
                         if(mysqli_query($myConnection, $sql)) {
                             echo "<div class='alert alert-success'>Product added successfully</div>";
                             echo "<script>window.location.href = 'products.php';</script>";
+<<<<<<< HEAD
                         } else {
                             echo "<div class='alert alert-danger'>Error uploading file</div>";
                         }
@@ -570,6 +575,8 @@ if(isset($_POST['addProduct'])) {
                         if(mysqli_query($myConnection, $sql)) {
                             echo "<div class='alert alert-success'>Product added successfully</div>";
                             echo "<script>window.location.href = 'products.php';</script>";
+=======
+>>>>>>> ba12532 (Product Crud Done for all requirment)
                         } else {
                             echo "<div class='alert alert-danger'>Error uploading file</div>";
                         }
