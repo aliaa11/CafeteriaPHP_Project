@@ -4,10 +4,14 @@
       die("Database connection failed");
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
   $items_per_page = 6; 
   $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
 =======
   $items_per_page = 4; 
+=======
+  $items_per_page = 3; 
+>>>>>>> 0d05dec (Product Crud Done for all requirment)
   $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 >>>>>>> 5baea74 (Product Crud Done for all requirment)
   if ($current_page < 1) $current_page = 1;
@@ -299,6 +303,7 @@
 >>>>>>> 5baea74 (Product Crud Done for all requirment)
                     </div>
                 </div>
+<<<<<<< HEAD
                 <button class="btn btn-success mt-4 floating" type="button" data-bs-toggle="modal" data-bs-target="#addProductModal">
                     <i class="fas fa-plus me-2"></i>Add Product
                 </button>
@@ -322,7 +327,12 @@
                 $search_by = $_GET['search_by'] ?? 'name';
                 
 =======
+=======
+>>>>>>> 0d05dec (Product Crud Done for all requirment)
             </div>
+            <button class="btn btn-success mt-4" type="button" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <i class="fas fa-plus me-2"></i>Add Product
+            </button>
             <input type="hidden" name="page" value="1">
         </form>
         <!-- display items -->
