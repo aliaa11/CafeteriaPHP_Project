@@ -26,7 +26,7 @@
                 <a class="nav-link text-light" href="./productCrud/products.php" target="content-frame">Products</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link text-light" href="./orderCrud.php/orders.php" target="content-frame">Order Status</a>
+                <a class="nav-link text-light" href="./orderCrud/orders.php" target="content-frame">Order Status</a>
               </li>
             </ul>
           </div>
