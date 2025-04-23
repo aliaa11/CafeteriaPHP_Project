@@ -5,6 +5,7 @@
   }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   $items_per_page = 6; 
   $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
 =======
@@ -18,6 +19,10 @@
 =======
   $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
 >>>>>>> c88e851 (update product done)
+=======
+  $items_per_page = 4; 
+  $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+>>>>>>> eb043ea (Product Crud Done for all requirment)
   if ($current_page < 1) $current_page = 1;
   $offset = ($current_page - 1) * $items_per_page;
 ?>
@@ -361,6 +366,7 @@
                           LEFT JOIN categories c ON p.category_id = c.id";
             if (isset($_GET['search_term'])) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 $search_term = mysqli_real_escape_string($myConnection, $_GET['search_term']);
                 $search_by = mysqli_real_escape_string($myConnection, $_GET['search_by'] ?? 'name');
 >>>>>>> 5baea74 (Product Crud Done for all requirment)
@@ -368,6 +374,10 @@
                 $search_term = $_GET['search_term'];
                 $search_by = $_GET['search_by'] ?? 'name';
 >>>>>>> c88e851 (update product done)
+=======
+                $search_term = mysqli_real_escape_string($myConnection, $_GET['search_term']);
+                $search_by = mysqli_real_escape_string($myConnection, $_GET['search_by'] ?? 'name');
+>>>>>>> eb043ea (Product Crud Done for all requirment)
                 if ($search_by === 'name') {
                     $sql .= " WHERE p.name LIKE '%$search_term%'";
                     $count_sql .= " WHERE p.name LIKE '%$search_term%'";
@@ -538,8 +548,15 @@
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<<<<<<< HEAD
 >>>>>>> 000af98 (order status done)
+=======
+<<<<<<< HEAD
+>>>>>>> eb043ea (Product Crud Done for all requirment)
                                         </div>
+=======
+                                                </div>
+>>>>>>> ba12532 (Product Crud Done for all requirment)
                                                 <div class="modal-body">
                                                     Are you sure you want to delete this product?
                                                 </div>
@@ -923,6 +940,7 @@ if(isset($_POST['addProduct'])) {
                         if(mysqli_query($myConnection, $sql)) {
                             echo "<div class='alert alert-success'>Product added successfully</div>";
                             echo "<script>window.location.href = 'products.php';</script>";
+<<<<<<< HEAD
                         } else {
                             echo "<div class='alert alert-danger'>Error uploading file</div>";
                         }
@@ -1329,6 +1347,8 @@ if(isset($_POST['addProduct'])) {
                         if(mysqli_query($myConnection, $sql)) {
                             echo "<div class='alert alert-success'>Product added successfully</div>";
                             echo "<script>window.location.href = 'products.php';</script>";
+=======
+>>>>>>> ba12532 (Product Crud Done for all requirment)
                         } else {
                             echo "<div class='alert alert-danger'>Error uploading file</div>";
                         }
