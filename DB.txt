@@ -1,0 +1,75 @@
+CREATE DATABASE cafeteriaDB;
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('user', 'admin') DEFAULT 'user'
+);
+
+CREATE TABLE items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2),
+  stock INT,
+  image_url VARCHAR(255)
+);
+
+CREATE TABLE orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  item_id INT,
+  quantity INT,
+  status ENUM('pending', 'confirmed', 'canceled', 'delivered') DEFAULT 'pending',
+  order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (item_id) REFERENCES items(id)
+);
+
+--------------------------------------------------------------
+Queries
+
+-- 👤 عرض كل المستخدمين
+-- SELECT * FROM users;
+
+-- ➕ إضافة مستخدم جديد
+-- INSERT INTO users (username, email, password) VALUES (?, ?, ?);
+
+-- ✏️ تعديل بيانات مستخدم
+-- UPDATE users SET username = ?, email = ? WHERE id = ?;
+
+-- ❌ حذف مستخدم
+-- DELETE FROM users WHERE id = ?;
+
+-- 📦 عرض كل المنتجات
+-- SELECT * FROM items;
+
+-- ➕ إضافة منتج جديد
+-- INSERT INTO items (name, description, price, stock, image_url) VALUES (?, ?, ?, ?, ?);
+
+-- ✏️ تعديل بيانات منتج
+-- UPDATE items SET name = ?, price = ?, stock = ? WHERE id = ?;
+
+-- ❌ حذف منتج
+-- DELETE FROM items WHERE id = ?;
+
+
+-- 👁️‍🗨️ عرض كل الأوردرات لكل المستخدمين (للأدمن)
+-- SELECT * FROM orders;
+
+-- 🧾 عرض كل الأوردرات لمستخدم معين
+-- SELECT * FROM orders WHERE user_id = ?;
+
+-- 🕓 عرض الأوردر الحالي (pending) لمستخدم معين
+-- SELECT * FROM orders WHERE user_id = ? AND status = 'pending';
+
+-- ➕ إضافة أوردر جديد لمستخدم معين
+-- INSERT INTO orders (user_id, item_id, quantity) VALUES (?, ?, ?);
+
+-- ✏️ تعديل حالة أوردر معين لمستخدم معين
+-- UPDATE orders SET status = ? WHERE id = ? AND user_id = ?;
+
+-- ❌ حذف أوردر معين لمستخدم معين
+-- DELETE FROM orders WHERE id = ? AND user_id = ?;
+
