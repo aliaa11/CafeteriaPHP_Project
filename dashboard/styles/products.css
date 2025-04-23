@@ -1,0 +1,53 @@
+/* Product card styling */
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-img {
+  height: 200px;
+  object-fit: cover;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Form step animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}
+
+.form-step.active {
+  animation: slideIn 0.3s ease-in-out;
+}
+
+.form-step {
+  display: none;
+  animation: slideOut 0.3s ease-in-out;
+}
+
+/* Badge styling */
+.badge-outline {
+  border: 1px solid currentColor;
+  background-color: transparent;
+}

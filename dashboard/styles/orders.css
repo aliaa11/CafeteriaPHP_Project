@@ -1,0 +1,51 @@
+/* Order status badges */
+.badge-pill {
+    padding: 0.5em 0.75em;
+  }
+  
+  /* Table row hover effect */
+  .table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+  
+  /* Action buttons */
+  .btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Responsive table */
+  @media (max-width: 768px) {
+    .table-responsive {
+      border: 0;
+    }
+    
+    .table-responsive thead {
+      display: none;
+    }
+    
+    .table-responsive tr {
+      display: block;
+      margin-bottom: 1rem;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+    }
+    
+    .table-responsive td {
+      display: block;
+      text-align: right;
+      padding-left: 50%;
+      position: relative;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .table-responsive td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 1rem;
+      width: calc(50% - 1rem);
+      padding-right: 1rem;
+      text-align: left;
+      font-weight: bold;
+    }
+  }

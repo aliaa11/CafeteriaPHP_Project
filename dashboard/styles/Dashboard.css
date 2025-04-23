@@ -1,0 +1,70 @@
+/* Custom variables */
+:root {
+  --darkBg: #212529;
+  --darkText: #f8f9fa;
+  --primary: #0d6efd;
+  --primaryHover: #0b5ed7;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--darkBg);
+  color: var(--darkText);
+}
+
+/* Sidebar styling */
+.side-bar {
+  background-color: var(--darkBg);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-txt {
+  font-weight: 700;
+  font-size: 1.5rem;
+  background: linear-gradient(90deg, #a3eaff, #0dcaf0);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-link {
+  color: var(--darkText);
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover, .nav-link:focus {
+  color: var(--darkText);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Main content area */
+.main-bar {
+  background-color: #f8f9fa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .side-bar {
+    position: fixed;
+    z-index: 1000;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .side-bar.show {
+    transform: translateX(0);
+  }
+}
+
+/* Iframe styling */
+iframe {
+  background-color: white;
+}

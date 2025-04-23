@@ -1,0 +1,43 @@
+/* User card styling */
+.user-card {
+    transition: transform 0.2s ease;
+  }
+  
+  .user-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  .progress {
+    height: 0.5rem;
+  }
+  
+  /* Empty state styling */
+  .empty-state {
+    padding: 3rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+  }
+  
+  .empty-state-icon {
+    font-size: 3rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+  }
+  
+  /* Search box styling */
+  .search-box {
+    position: relative;
+  }
+  
+  .search-box .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: #6c757d;
+  }
+  
+  .search-box input {
+    padding-left: 3rem;
+  }
