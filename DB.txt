@@ -89,7 +89,7 @@ CREATE TABLE orders (
 -- SELECT * FROM orders WHERE user_id = ?;
 
 -- عرض الأوردر الحالي لليوزر (pending)
--- SELECT * FROM orders WHERE user_id = ? AND status = 'pending';
+-- SELECT * FROM orders WHERE user_id = ? AND status = 'processing';
 
 -- إضافة أوردر جديد
 -- INSERT INTO orders (user_id, item_id, quantity) VALUES (?, ?, ?);
