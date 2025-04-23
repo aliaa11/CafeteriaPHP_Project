@@ -98,4 +98,4 @@ CREATE TABLE orders (
 -- DELETE FROM orders WHERE id = ? AND user_id = ?;
 
 -- الأدمن يكنسل أوردر طالما مش delivered
--- UPDATE orders SET status = 'canceled' WHERE id = ? AND status != 'delivered';
+-- UPDATE orders SET status = 'canceled' WHERE id = ? AND status != 'delivered' AND status != 'confirmed';
