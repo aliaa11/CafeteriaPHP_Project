@@ -1,4 +1,4 @@
-CREATE DATABASE cafeteriaDB;
+-- جدول المستخدمين
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
@@ -7,69 +7,95 @@ CREATE TABLE users (
   role ENUM('user', 'admin') DEFAULT 'user'
 );
 
+-- جدول الكاتيجوريز
+CREATE TABLE categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL
+);
+
+-- جدول المنتجات
 CREATE TABLE items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description TEXT,
   price DECIMAL(10,2),
   stock INT,
-  image_url VARCHAR(255)
+  image_url VARCHAR(255),
+  category_id INT,
+  FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
+-- جدول الأوردرات
 CREATE TABLE orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT,
   item_id INT,
   quantity INT,
-  status ENUM('pending', 'confirmed', 'canceled', 'delivered') DEFAULT 'pending',
+  status ENUM('pending', 'confirmed', 'processing', 'canceled', 'delivered') DEFAULT 'pending',
   order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (item_id) REFERENCES items(id)
 );
 
---------------------------------------------------------------
-Queries
+-- ✅ كويريز CRUD
 
--- 👤 عرض كل المستخدمين
+-- 👤 المستخدمين
+-- عرض كل المستخدمين
 -- SELECT * FROM users;
 
--- ➕ إضافة مستخدم جديد
+-- إضافة مستخدم جديد
 -- INSERT INTO users (username, email, password) VALUES (?, ?, ?);
 
--- ✏️ تعديل بيانات مستخدم
+-- تعديل مستخدم
 -- UPDATE users SET username = ?, email = ? WHERE id = ?;
 
--- ❌ حذف مستخدم
+-- حذف مستخدم
 -- DELETE FROM users WHERE id = ?;
 
--- 📦 عرض كل المنتجات
+
+-- 📦 المنتجات
+-- عرض كل المنتجات
 -- SELECT * FROM items;
 
--- ➕ إضافة منتج جديد
--- INSERT INTO items (name, description, price, stock, image_url) VALUES (?, ?, ?, ?, ?);
+-- إضافة منتج جديد
+-- INSERT INTO items (name, description, price, stock, image_url, category_id) VALUES (?, ?, ?, ?, ?, ?);
 
--- ✏️ تعديل بيانات منتج
+-- تعديل منتج
 -- UPDATE items SET name = ?, price = ?, stock = ? WHERE id = ?;
 
--- ❌ حذف منتج
+-- حذف منتج
 -- DELETE FROM items WHERE id = ?;
 
 
--- 👁️‍🗨️ عرض كل الأوردرات لكل المستخدمين (للأدمن)
--- SELECT * FROM orders;
+-- 🗂️ الكاتيجوريز
+-- عرض كل الكاتيجوريز
+-- SELECT * FROM categories;
 
--- 🧾 عرض كل الأوردرات لمستخدم معين
+-- إضافة كاتيجوري
+-- INSERT INTO categories (name) VALUES (?);
+
+-- تعديل كاتيجوري
+-- UPDATE categories SET name = ? WHERE id = ?;
+
+-- حذف كاتيجوري
+-- DELETE FROM categories WHERE id = ?;
+
+
+-- 🧾 الأوردرات
+-- عرض أوردرات مستخدم معين
 -- SELECT * FROM orders WHERE user_id = ?;
 
--- 🕓 عرض الأوردر الحالي (pending) لمستخدم معين
+-- عرض الأوردر الحالي لليوزر (pending)
 -- SELECT * FROM orders WHERE user_id = ? AND status = 'pending';
 
--- ➕ إضافة أوردر جديد لمستخدم معين
+-- إضافة أوردر جديد
 -- INSERT INTO orders (user_id, item_id, quantity) VALUES (?, ?, ?);
 
--- ✏️ تعديل حالة أوردر معين لمستخدم معين
+-- تعديل حالة أوردر معين لمستخدم معين
 -- UPDATE orders SET status = ? WHERE id = ? AND user_id = ?;
 
--- ❌ حذف أوردر معين لمستخدم معين
+-- حذف أوردر معين لمستخدم معين
 -- DELETE FROM orders WHERE id = ? AND user_id = ?;
 
+-- الأدمن يكنسل أوردر طالما مش delivered
+-- UPDATE orders SET status = 'canceled' WHERE id = ? AND status != 'delivered';
