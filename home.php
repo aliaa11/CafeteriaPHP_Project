@@ -1,5 +1,6 @@
 <?php
 session_start();
+<<<<<<< HEAD
 include_once './config/dbConnection.php';
 
 if (!isset($_SESSION['cart'])) {
@@ -55,12 +56,23 @@ while ($row = mysqli_fetch_assoc($result)) {
 mysqli_data_seek($result, 0);
 
 $cart_count = array_sum($_SESSION['cart']);
+=======
+
+// تحقق إذا كان المستخدم قد سجل الدخول
+if (!isset($_SESSION["username"])) {
+    // إذا لم يكن هناك جلسة، إعادة التوجيه إلى صفحة تسجيل الدخول
+    header("Location: login.php");
+    exit;
+}
+
+>>>>>>> 63d3ef8 (my work for cafeteria project)
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<<<<<<< HEAD
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feane Cafeteria - Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
@@ -414,3 +426,18 @@ $cart_count = array_sum($_SESSION['cart']);
 
 
 
+=======
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container text-center mt-5">
+        <h1>Welcome, <?= htmlspecialchars($_SESSION["username"]) ?>!</h1>
+        <p>You are logged in as a <?= htmlspecialchars($_SESSION["role"]) ?>.</p>
+        <a href="logout.php" class="btn btn-danger">Logout</a>
+    </div>
+
+</body>
+</html>
+>>>>>>> 63d3ef8 (my work for cafeteria project)
