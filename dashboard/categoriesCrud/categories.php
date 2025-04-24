@@ -48,8 +48,8 @@ $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                 <td><?php echo $cat['id']; ?></td>
                                 <td><?php echo htmlspecialchars($cat['name']); ?></td>
                                 <td>
-                                    <a href="edit_category.php?id=<?php echo $cat['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="delete_category.php?id=<?php echo $cat['id']; ?>" onclick="return confirm('Delete this category?');" class="btn btn-danger btn-sm">Delete</a>
+                                    <a href="editcategory.php?id=<?php echo $cat['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="deletecategory.php?id=<?php echo $cat['id']; ?>" onclick="return confirm('Delete this category?');" class="btn btn-danger btn-sm">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
