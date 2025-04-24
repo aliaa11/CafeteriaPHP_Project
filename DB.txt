@@ -6,11 +6,16 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   role ENUM('user', 'admin') DEFAULT 'user',
 <<<<<<< HEAD
+<<<<<<< HEAD
  profile_picture VARCHAR(255) DEFAULT '../uploads/users/default.png';
 =======
 ADD COLUMN room_number VARCHAR(10),
 ADD COLUMN profile_picture VARCHAR(255) DEFAULT 'images/default.png';
 >>>>>>> 434691c (Update DB.txt)
+=======
+ room_number VARCHAR(10),
+ profile_picture VARCHAR(255) DEFAULT 'images/default.png';
+>>>>>>> fb56aaa (Update DB.txt)
 
 );
 
