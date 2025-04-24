@@ -14,6 +14,7 @@
 =======
   $items_per_page = 3; 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 0d05dec (Product Crud Done for all requirment)
   $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 >>>>>>> 5baea74 (Product Crud Done for all requirment)
@@ -27,6 +28,9 @@
 >>>>>>> d45f9fe (Product Crud Done for all requirment)
   $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 >>>>>>> eb043ea (Product Crud Done for all requirment)
+=======
+  $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+>>>>>>> 8e8a4b4 (update product done)
   if ($current_page < 1) $current_page = 1;
   $offset = ($current_page - 1) * $items_per_page;
 ?>
@@ -325,7 +329,7 @@
                             <option value="name" <?= isset($_GET['search_by']) && $_GET['search_by'] == 'name' ? 'selected' : '' ?>>Search by Name</option>
                             <option value="category" <?= isset($_GET['search_by']) && $_GET['search_by'] == 'category' ? 'selected' : '' ?>>Search by Category</option>
                         </select>
-                        <input type="text" class="form-control" name="search_term" value="<?= isset($_GET['search_term']) ? htmlspecialchars($_GET['search_term']) : '' ?>" placeholder="Enter search term">
+                        <input type="text" class="form-control" name="search_term" value="<?= isset($_GET['search_term']) ? $_GET['search_term'] : '' ?>" placeholder="Enter search term">
                         <button class="btn btn-primary" type="submit">Search</button>
 >>>>>>> 5baea74 (Product Crud Done for all requirment)
                     </div>
@@ -1159,10 +1163,11 @@ if(isset($_POST['addProduct'])) {
             $sql = "SELECT p.*, c.name as category_name FROM items p 
                     LEFT JOIN categories c ON p.category_id = c.id";
             $count_sql = "SELECT COUNT(*) as total FROM items p 
-                          LEFT JOIN categories c ON p.category_id = c.id";
+                    LEFT JOIN categories c ON p.category_id = c.id";
+            // ============================
             if (isset($_GET['search_term'])) {
-                $search_term = mysqli_real_escape_string($myConnection, $_GET['search_term']);
-                $search_by = mysqli_real_escape_string($myConnection, $_GET['search_by'] ?? 'name');
+                $search_term = $_GET['search_term'];
+                $search_by = $_GET['search_by'] ?? 'name';
                 if ($search_by === 'name') {
                     $sql .= " WHERE p.name LIKE '%$search_term%'";
                     $count_sql .= " WHERE p.name LIKE '%$search_term%'";
@@ -1171,62 +1176,64 @@ if(isset($_POST['addProduct'])) {
                     $count_sql .= " WHERE c.name LIKE '%$search_term%'";
                 }
             }
+
             $sql .= " LIMIT $offset, $items_per_page";
             $count_result = mysqli_query($myConnection, $count_sql);
             $total_items = mysqli_fetch_assoc($count_result)['total'];
             $total_pages = ceil($total_items / $items_per_page);
             $result = mysqli_query($myConnection, $sql);
+
             if (mysqli_num_rows($result) > 0) {
-                while ($product = mysqli_fetch_assoc($result)) {
-                    $is_out_of_stock = $product['stock'] <= 0;
-                    $is_low_stock = $product['stock'] > 0 && $product['stock'] <= 5;
-                    ?>
-                    <div class="col">
-                        <div class="card h-100 product-card <?= $is_out_of_stock ? 'out-of-stock' : '' ?>">
-                            <div class="card-img-container">
-                                <?php if(!empty($product['image_url'])): ?>
-                                    <img src="<?= htmlspecialchars($product['image_url']) ?>" class="card-img-top product-img" alt="<?= htmlspecialchars($product['name']) ?>">
-                                <?php else: ?>
-                                    <div class="product-img bg-secondary d-flex align-items-center justify-content-center">
-                                        <i class="fas fa-box-open fa-4x text-light"></i>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title"><?= htmlspecialchars($product['name']) ?></h5>
-                                <p class="card-text"><?= substr(htmlspecialchars($product['description']), 0, 100) ?>...</p>
-                                <p class="text-success fw-bold">Price: $<?= number_format($product['price'], 2) ?></p>
-                                <div class="stock-info <?= $is_low_stock ? 'low-stock' : '' ?>">
-                                    Stock: <?= htmlspecialchars($product['stock']) ?>
+            while ($product = mysqli_fetch_assoc($result)) {
+                $is_out_of_stock = $product['stock'] <= 0;
+                $is_low_stock = $product['stock'] > 0 && $product['stock'] <= 5;
+                ?>
+                
+                <div class="col">
+                    <div class="card h-100 product-card <?= $is_out_of_stock ? 'out-of-stock' : '' ?>">
+                        <div class="card-img-container">
+                            <?php if(!empty($product['image_url'])): ?>
+                                <img src="<?= $product['image_url'] ?>" class="card-img-top product-img" alt="<?= $product['name'] ?>">
+                            <?php else: ?>
+                                <div class="product-img bg-secondary d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-box-open fa-4x text-light"></i>
                                 </div>
-                                <p class="text-muted">Category: <?= htmlspecialchars($product['category_name']) ?></p>
+                            <?php endif; ?>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title"><?= $product['name'] ?></h5>
+                            <p class="card-text"><?= substr($product['description'], 0, 100) ?>...</p>
+                            <p class="text-success fw-bold">Price: $<?= number_format($product['price'], 2) ?></p>
+                            <div class="stock-info <?= $is_low_stock ? 'low-stock' : '' ?>">
+                                Stock: <?= $product['stock'] ?>
                             </div>
-                            <div class="card-footer bg-transparent">
-                                <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn btn-sm btn-primary me-2">Edit</a>
-                                <?php if($is_out_of_stock): ?>
-                                    <button class="btn btn-sm btn-danger" disabled>Delete</button>
-                                <?php else: ?>
-                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $product['id'] ?>">Delete</button>
-                                    <!-- Delete Confirmation Modal -->
-                                    <div class="modal fade" id="deleteModal<?= $product['id'] ?>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    Are you sure you want to delete this product?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                    <a href="delete_product.php?id=<?= $product['id'] ?>" class="btn btn-danger">Delete</a>
-                                                </div>
-                                            </div>
+                            <p class="text-muted">Category: <?= $product['category_name'] ?></p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn btn-sm btn-primary me-2">Edit</a>
+                            <?php if($is_out_of_stock): ?>
+                                <button class="btn btn-sm btn-danger" disabled>Delete</button>
+                            <?php else: ?>
+                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $product['id'] ?>">Delete</button>
+                                <!-- Delete Confirmation Modal -->
+                            <div class="modal fade" id="deleteModal<?= $product['id'] ?>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure you want to delete this product?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <a href="delete_product.php?id=<?= $product['id'] ?>" class="btn btn-danger">Delete</a>
                                         </div>
                                     </div>
-                                <?php endif; ?>
+                                </div>
                             </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -1341,21 +1348,21 @@ if(isset($_POST['addProduct'])) {
         $fileTmp = $_FILES['image']['tmp_name'];
         $fileSize = $_FILES['image']['size'];
         $fileError = $_FILES['image']['error'];
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'svg'];
-        if(in_array($fileExt, $allowed)) {
+        if(!empty($fileName) && !empty($fileTmp)) {
+            $fileArray = explode(".", $fileName);
+            $lastElementExt = strtolower(end($fileArray)); 
+            $arr = ["png", "jpg", "gif", "svg"];
+            
+        if(in_array($lastElementExt,$arr)) {
             if($fileError === 0) {
                 if($fileSize < 200000000) { 
-                    $fileNameNew = uniqid('', true).'.'.$fileExt;
-                    $fileDestination = '../uploads/products/'.$fileNameNew;
+                    $fileDestination = '../uploads/products/'.time().$fileName;
                     if(move_uploaded_file($fileTmp, $fileDestination)) {
                         $sql = "INSERT INTO items (name, description, price, stock, image_url, category_id) 
-        VALUES ('$name', '$description', $price, $stock, '$fileDestination', $category)";
+                        VALUES ('$name', '$description', $price, $stock, '$fileDestination', $category)";
                         if(mysqli_query($myConnection, $sql)) {
                             echo "<div class='alert alert-success'>Product added successfully</div>";
                             echo "<script>window.location.href = 'products.php';</script>";
-=======
->>>>>>> ba12532 (Product Crud Done for all requirment)
                         } else {
                             echo "<div class='alert alert-danger'>Error uploading file</div>";
                         }
@@ -1370,6 +1377,10 @@ if(isset($_POST['addProduct'])) {
             }
         }
     }
+<<<<<<< HEAD
 }
 >>>>>>> 890f3ba (update items  done)
+=======
+}}
+>>>>>>> 8e8a4b4 (update product done)
 ?>
