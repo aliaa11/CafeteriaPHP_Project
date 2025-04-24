@@ -37,6 +37,7 @@ CREATE TABLE orders (
   quantity INT,
   status ENUM('confirmed', 'processing', 'canceled', 'delivered') DEFAULT 'pending',
   order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  room_number VARCHAR(10),
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (item_id) REFERENCES items(id)
 );
