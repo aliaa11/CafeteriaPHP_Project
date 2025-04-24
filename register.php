@@ -9,9 +9,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
     $confirm = $_POST["confirm"];
+    $room_number = $_POST["room_number"];
 
-    // Validation
-    if (empty($username) || empty($email) || empty($password)) {
+    if (empty($username) || empty($email) || empty($password) || empty($room_number)) {
         $errors[] = "All fields are required.";
     }
 
@@ -27,25 +27,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors[] = "Password must be at least 6 characters.";
     }
 
+    // Handle profile picture
+    if (!empty($_FILES["profile_picture"]["name"])) {
+        $fileName = $_FILES["profile_picture"]["name"];
+        $fileTmp = $_FILES["profile_picture"]["tmp_name"];
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowed = ["png", "jpg", "jpeg", "gif"];
+
+        if (in_array($ext, $allowed)) {
+            $newFileName = "images/" . time() . "_" . $fileName;
+            move_uploaded_file($fileTmp, $newFileName);
+            $profile_picture = $newFileName;
+        } else {
+            $errors[] = "Invalid image format. Allowed: png, jpg, jpeg, gif";
+        }
+    } else {
+        $profile_picture = "images/default.png";
+    }
+
     if (empty($errors)) {
-        // Check if email already exists
         $check_query = "SELECT id FROM users WHERE email = '$email'";
         $result = mysqli_query($connection, $check_query);
 
         if (mysqli_num_rows($result) > 0) {
             $errors[] = "Email already registered.";
         } else {
-          // Hash the password
-          $hashedPassword = password_hash($password, PASSWORD_DEFAULT); // هنا تشفير كلمة المرور
-
-            $query = "INSERT INTO users (username, email, password) 
-                      VALUES ('$username', '$email', '$hashedPassword')"; // استخدم $hashedPassword هنا
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $query = "INSERT INTO users (username, email, password, room_number, profile_picture) 
+                      VALUES ('$username', '$email', '$hashedPassword', '$room_number', '$profile_picture')";
             $insert_result = mysqli_query($connection, $query);
 
             if ($insert_result) {
                 $_SESSION["username"] = $username;
                 $_SESSION["email"] = $email;
-
                 header("Location: login.php");
                 exit;
             } else {
@@ -53,10 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     }
-    
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,40 +81,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   background: url('images/5785243870685153502.jpg') no-repeat center center;
   background-size: cover;" 
   class="d-flex justify-content-center align-items-center vh-100">
-  <div class="card p-4 shadow-lg rounded-4" 
-     style="width: 600px; background-color: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px);">
 
-
+  <div class="card p-4 shadow-lg rounded-4"
+       style="width: 600px; background-color: rgba(255,255,255,0.7); backdrop-filter: blur(8px);">
     <h3 class="mb-3 text-center">Register</h3>
 
     <?php if (!empty($errors)): ?>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      let errors = <?php echo json_encode($errors); ?>;
-
-      let alertDiv = document.createElement("div");
-      alertDiv.className = "alert alert-danger";
-      alertDiv.role = "alert";
-
-      let list = document.createElement("ul");
-      list.className = "mb-0";
-
-      errors.forEach(function(err) {
-        let li = document.createElement("li");
-        li.textContent = err;
-        list.appendChild(li);
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let errors = <?php echo json_encode($errors); ?>;
+        let alertDiv = document.createElement("div");
+        alertDiv.className = "alert alert-danger";
+        alertDiv.role = "alert";
+        let list = document.createElement("ul");
+        list.className = "mb-0";
+        errors.forEach(function(err) {
+          let li = document.createElement("li");
+          li.textContent = err;
+          list.appendChild(li);
+        });
+        alertDiv.appendChild(list);
+        let card = document.querySelector(".card");
+        card.prepend(alertDiv);
       });
+    </script>
+    <?php endif; ?>
 
-      alertDiv.appendChild(list);
-
-      let card = document.querySelector(".card");
-      card.prepend(alertDiv);
-    });
-  </script>
-<?php endif; ?>
-
-
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
       <div class="mb-3">
         <label for="username" class="form-label">Username</label>
         <input type="text" name="username" id="username" class="form-control" required>
@@ -123,9 +128,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="password" name="confirm" id="confirm" class="form-control" required>
       </div>
 
+      <div class="mb-3">
+        <label for="room_number" class="form-label">Room Number</label>
+        <select name="room_number" id="room_number" class="form-control" required>
+          <option value="">Select Room</option>
+          <option value="101">101</option>
+          <option value="102">102</option>
+          <option value="103">103</option>
+          <option value="104">104</option>
+          <option value="105">105</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="profile_picture" class="form-label">Profile Picture</label>
+        <input type="file" name="profile_picture" id="profile_picture" class="form-control" accept="image/*">
+      </div>
+
       <button type="submit" class="btn w-100" style="background-color: #6f4e37; color: white;">Register</button>
-      </form>
+      <div class="text-center mt-3">
+        <a href="login.php" class="text-decoration-none">Already have an account? Login</a>
+      </div>
+    </form>
   </div>
 
 </body>
 </html>
+
+
