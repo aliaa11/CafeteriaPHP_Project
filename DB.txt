@@ -5,9 +5,15 @@ CREATE TABLE users (
   email VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   role ENUM('user', 'admin') DEFAULT 'user',
+<<<<<<< HEAD
  profile_picture VARCHAR(255) DEFAULT '../uploads/users/default.png';
+=======
+ADD COLUMN room_number VARCHAR(10),
+ADD COLUMN profile_picture VARCHAR(255) DEFAULT 'images/default.png';
+>>>>>>> 434691c (Update DB.txt)
 
 );
+
 
 -- جدول الكاتيجوريز
 CREATE TABLE categories (
