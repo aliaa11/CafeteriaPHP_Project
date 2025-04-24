@@ -4,8 +4,12 @@ CREATE TABLE users (
   username VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
-  role ENUM('user', 'admin') DEFAULT 'user'
+  role ENUM('user', 'admin') DEFAULT 'user',
+ADD COLUMN room_number VARCHAR(10),
+ADD COLUMN profile_picture VARCHAR(255) DEFAULT 'images/default.png';
+
 );
+
 
 -- جدول الكاتيجوريز
 CREATE TABLE categories (
