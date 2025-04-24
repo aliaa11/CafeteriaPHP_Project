@@ -14,8 +14,12 @@ ADD COLUMN profile_picture VARCHAR(255) DEFAULT 'images/default.png';
 >>>>>>> 434691c (Update DB.txt)
 =======
  room_number VARCHAR(10),
+<<<<<<< HEAD
  profile_picture VARCHAR(255) DEFAULT 'images/default.png';
 >>>>>>> fb56aaa (Update DB.txt)
+=======
+ profile_picture VARCHAR(255) DEFAULT '../uploads/users/default.png';
+>>>>>>> 36b8af8 (Update DB.txt)
 
 );
 
