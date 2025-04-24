@@ -5,8 +5,8 @@ CREATE TABLE users (
   email VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   role ENUM('user', 'admin') DEFAULT 'user',
-ADD COLUMN room_number VARCHAR(10),
-ADD COLUMN profile_picture VARCHAR(255) DEFAULT 'images/default.png';
+ room_number VARCHAR(10),
+ profile_picture VARCHAR(255) DEFAULT 'images/default.png';
 
 );
 
