@@ -6,11 +6,6 @@ include_once './config/dbConnection.php';
 =======
 include_once 'db.php';
 
-// إنشاء جلسة للسلة لو مش موجودة
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
-
 // التأكد من إن المستخدم مسجل دخول
 >>>>>>> b0afb19 (home,logout,cart,order)
 if (!isset($_SESSION['user_id'])) {
@@ -22,10 +17,18 @@ if (!isset($_SESSION['user_id'])) {
 <<<<<<< HEAD
 $user_id = $_SESSION['user_id'];
 
+<<<<<<< HEAD
+=======
+// إنشاء جلسة للسلة لو مش موجودة
+>>>>>>> 16a93a9 (updatemyorder&cart)
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
+<<<<<<< HEAD
+=======
+// جلب أحدث أوردار للمستخدم
+>>>>>>> 16a93a9 (updatemyorder&cart)
 $latest_order_query = "SELECT orders.*, SUM(items.price * orders.quantity) as total_price 
                        FROM orders 
                        JOIN items ON orders.item_id = items.id 
@@ -33,6 +36,7 @@ $latest_order_query = "SELECT orders.*, SUM(items.price * orders.quantity) as to
                        GROUP BY orders.id 
                        ORDER BY orders.order_date DESC 
                        LIMIT 1";
+<<<<<<< HEAD
 $latest_order_result = mysqli_query($myConnection, $latest_order_query);
 $latest_order = mysqli_fetch_assoc($latest_order_result);
 
@@ -41,6 +45,11 @@ $latest_order = mysqli_fetch_assoc($latest_order_result);
 $user_id = $_SESSION['user_id'];
 
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
+=======
+$latest_order_result = mysqli_query($connection, $latest_order_query);
+$latest_order = mysqli_fetch_assoc($latest_order_result);
+
+>>>>>>> 16a93a9 (updatemyorder&cart)
 // تعديل الكمية في السلة
 >>>>>>> b0afb19 (home,logout,cart,order)
 if (isset($_POST['update_quantity'])) {
@@ -224,6 +233,9 @@ $cart_count = array_sum($_SESSION['cart']);
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 16a93a9 (updatemyorder&cart)
         /* Latest Order Section */
         .latest-order {
             background-color: #5C4033;
@@ -245,8 +257,11 @@ $cart_count = array_sum($_SESSION['cart']);
             color: #d2b48c;
         }
 
+<<<<<<< HEAD
 =======
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+>>>>>>> 16a93a9 (updatemyorder&cart)
         /* Cart Section */
         .cart-section {
             background-color: #5C4033;
@@ -254,10 +269,14 @@ $cart_count = array_sum($_SESSION['cart']);
             padding: 30px;
             border-radius: 15px;
 <<<<<<< HEAD
+<<<<<<< HEAD
             margin: 20px auto 30px auto;
 =======
             margin: 100px auto 30px auto;
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+            margin: 20px auto 30px auto;
+>>>>>>> 16a93a9 (updatemyorder&cart)
             max-width: 600px;
         }
         .cart-section h3 {
@@ -478,6 +497,9 @@ $cart_count = array_sum($_SESSION['cart']);
     </nav>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 16a93a9 (updatemyorder&cart)
     <!-- Latest Order Section -->
     <?php if ($latest_order): ?>
         <section class="latest-order">
@@ -488,6 +510,7 @@ $cart_count = array_sum($_SESSION['cart']);
         </section>
     <?php endif; ?>
 
+<<<<<<< HEAD
     <!-- Cart Section -->
     <section class="cart-section">
     <h3>Your Cart</h3>
@@ -551,6 +574,8 @@ $cart_count = array_sum($_SESSION['cart']);
     <?php endif; ?>
 </section>
 =======
+=======
+>>>>>>> 16a93a9 (updatemyorder&cart)
     <!-- Cart Section -->
     <section class="cart-section">
         <h3>Your Cart</h3>
@@ -576,7 +601,7 @@ $cart_count = array_sum($_SESSION['cart']);
                 <?php endif; ?>
                 <div class="cart-item-details">
                     <h6><?php echo htmlspecialchars($item['name']); ?></h6>
-                    <div class="subtotal">$<?php echo $subtotal; ?></div>
+                    <div class="subtotal"><?php echo $subtotal; ?> EGP</div>
                 </div>
                 <div class="quantity-controls">
                     <form method="post" style="display: inline;">
@@ -602,7 +627,7 @@ $cart_count = array_sum($_SESSION['cart']);
         }
         ?>
         <div class="total-price">
-            Total: $<span id="total-price"><?php echo number_format($total_price, 2); ?></span>
+            Total: <span id="total-price"><?php echo number_format($total_price, 2); ?> EGP</span>
         </div>
 
         <!-- Order Now Button to Open Modal -->
@@ -653,10 +678,14 @@ $cart_count = array_sum($_SESSION['cart']);
                                 <span><?php echo htmlspecialchars($item['name']); ?></span>
                                 <span class="cart-quantity"><?php echo $quantity; ?></span>
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 <span><?php echo $subtotal; ?> EGP</span>
 =======
                                 <span>$<?php echo $subtotal; ?></span>
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+                                <span><?php echo $subtotal; ?> EGP</span>
+>>>>>>> 16a93a9 (updatemyorder&cart)
                             </div>
                         <?php
                             }
@@ -664,10 +693,14 @@ $cart_count = array_sum($_SESSION['cart']);
                         ?>
                         <div class="total-price">
 <<<<<<< HEAD
+<<<<<<< HEAD
                             Total: <span><?php echo number_format($modal_total_price, 2); ?> EGP</span>
 =======
                             Total: $<span><?php echo number_format($modal_total_price, 2); ?></span>
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+                            Total: <span><?php echo number_format($modal_total_price, 2); ?> EGP</span>
+>>>>>>> 16a93a9 (updatemyorder&cart)
                         </div>
 
                         <!-- Room Number Dropdown -->
@@ -709,6 +742,7 @@ $cart_count = array_sum($_SESSION['cart']);
 </html>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 
@@ -724,3 +758,5 @@ $cart_count = array_sum($_SESSION['cart']);
 mysqli_close($connection);
 ?>
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
+=======
+>>>>>>> 16a93a9 (updatemyorder&cart)

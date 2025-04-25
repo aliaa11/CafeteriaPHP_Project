@@ -77,11 +77,41 @@ $result = mysqli_stmt_get_result($stmt);
 
 $user_id = $_SESSION['user_id'];
 
-// جلب الأوردارات بتاعة المستخدم
+// عدد الأوردارات في كل صفحة
+$orders_per_page = 5;
+
+// جلب الصفحة الحالية من الـ URL
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($current_page < 1) $current_page = 1;
+
+// حساب الـ Offset
+$offset = ($current_page - 1) * $orders_per_page;
+
+// جلب قيم التاريخ من الفورم لو موجودة
+$date_from = isset($_GET['date_from']) ? $_GET['date_from'] : '';
+$date_to = isset($_GET['date_to']) ? $_GET['date_to'] : '';
+
+// بناء الـ Query بناءً على فلترة التاريخ
+$where_clause = "WHERE orders.user_id = $user_id";
+if ($date_from && $date_to) {
+    $where_clause .= " AND orders.order_date BETWEEN '$date_from' AND '$date_to'";
+}
+
+// جلب عدد الأوردارات الكلي بعد الفلترة
+$count_query = "SELECT COUNT(*) as total FROM orders $where_clause";
+$count_result = mysqli_query($connection, $count_query);
+$count_row = mysqli_fetch_assoc($count_result);
+$total_orders = $count_row['total'];
+
+// حساب عدد الصفحات الكلي
+$total_pages = ceil($total_orders / $orders_per_page);
+
+// جلب الأوردارات مع الـ LIMIT والـ OFFSET
 $query = "SELECT orders.*, items.name AS item_name, items.price AS item_price 
           FROM orders 
           JOIN items ON orders.item_id = items.id 
-          WHERE orders.user_id = $user_id";
+          $where_clause 
+          LIMIT $orders_per_page OFFSET $offset";
 $result = mysqli_query($connection, $query);
 ?>
 >>>>>>> b0afb19 (home,logout,cart,order)
@@ -274,6 +304,7 @@ $result = mysqli_query($connection, $query);
         .pagination .page-item.active .page-link {
             background-color: #d2b48c;
             color: #5C4033;
+<<<<<<< HEAD
 =======
             background-color: #5C4033;
             color: white;
@@ -326,6 +357,9 @@ $result = mysqli_query($connection, $query);
         }
 =======
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
+=======
+        }
+>>>>>>> 16a93a9 (updatemyorder&cart)
 
         /* Footer */
         footer {
@@ -411,6 +445,7 @@ $result = mysqli_query($connection, $query);
             <div class="heading_container">
                 <h2>My Orders</h2>
             </div>
+<<<<<<< HEAD
 <<<<<<< HEAD
 
             <div class="row mb-4">
@@ -583,20 +618,78 @@ $result = mysqli_query($connection, $query);
                     <th>Edit</th>
                 </tr>
                 <?php while ($order = mysqli_fetch_assoc($result)) : ?>
+=======
+
+            <!-- Date Range Filter Form -->
+            <form method="GET" class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label for="date_from" class="form-label">Date From</label>
+                    <input type="date" name="date_from" id="date_from" class="form-control" value="<?php echo htmlspecialchars($date_from); ?>">
+                </div>
+                <div class="col-md-4">
+                    <label for="date_to" class="form-label">Date To</label>
+                    <input type="date" name="date_to" id="date_to" class="form-control" value="<?php echo htmlspecialchars($date_to); ?>">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+
+            <?php if (mysqli_num_rows($result) > 0): ?>
+                <table class="table">
+>>>>>>> 16a93a9 (updatemyorder&cart)
                     <tr>
-                        <td><?php echo htmlspecialchars($order['id']); ?></td>
-                        <td><?php echo htmlspecialchars($order['item_name']); ?></td>
-                        <td>$<?php echo htmlspecialchars($order['item_price']); ?></td>
-                        <td><?php echo htmlspecialchars($order['quantity']); ?></td>
-                        <td>$<?php echo htmlspecialchars($order['quantity'] * $order['item_price']); ?></td>
-                        <td><?php echo htmlspecialchars($order['room_number']); ?></td>
-                        <td><?php echo htmlspecialchars($order['status']); ?></td>
-                        <td><?php echo htmlspecialchars($order['order_date']); ?></td>
-                        <td><a href="delete_order.php?orderid=<?php echo $order['id']; ?>" class="btn btn-danger">Delete</a></td>
-                        <td><a href="edit_order.php?orderid=<?php echo $order['id']; ?>" class="btn btn-warning">Edit</a></td>
+                        <th>Order ID</th>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Room Number</th>
+                        <th>Status</th>
+                        <th>Order Date</th>
+                        <th>Delete</th>
+                        <th>Edit</th>
                     </tr>
-                <?php endwhile; ?>
-            </table>
+                    <?php while ($order = mysqli_fetch_assoc($result)) : ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($order['id']); ?></td>
+                            <td><?php echo htmlspecialchars($order['item_name']); ?></td>
+                            <td>$<?php echo htmlspecialchars($order['item_price']); ?></td>
+                            <td><?php echo htmlspecialchars($order['quantity']); ?></td>
+                            <td>$<?php echo htmlspecialchars($order['quantity'] * $order['item_price']); ?></td>
+                            <td><?php echo htmlspecialchars($order['room_number']); ?></td>
+                            <td><?php echo htmlspecialchars($order['status']); ?></td>
+                            <td><?php echo htmlspecialchars($order['order_date']); ?></td>
+                            <td><a href="delete_order.php?orderid=<?php echo $order['id']; ?>" class="btn btn-danger">Delete</a></td>
+                            <td><a href="edit_order.php?orderid=<?php echo $order['id']; ?>" class="btn btn-warning">Edit</a></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </table>
+
+                <!-- Pagination -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <!-- Previous Button -->
+                        <li class="page-item <?php if ($current_page == 1) echo 'disabled'; ?>">
+                            <a class="page-link" href="my_orders.php?page=<?php echo $current_page - 1; ?>&date_from=<?php echo urlencode($date_from); ?>&date_to=<?php echo urlencode($date_to); ?>">Previous</a>
+                        </li>
+
+                        <!-- Page Numbers -->
+                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                            <li class="page-item <?php if ($i == $current_page) echo 'active'; ?>">
+                                <a class="page-link" href="my_orders.php?page=<?php echo $i; ?>&date_from=<?php echo urlencode($date_from); ?>&date_to=<?php echo urlencode($date_to); ?>"><?php echo $i; ?></a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <!-- Next Button -->
+                        <li class="page-item <?php if ($current_page == $total_pages) echo 'disabled'; ?>">
+                            <a class="page-link" href="my_orders.php?page=<?php echo $current_page + 1; ?>&date_from=<?php echo urlencode($date_from); ?>&date_to=<?php echo urlencode($date_to); ?>">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            <?php else: ?>
+                <p>No orders found for the selected date range.</p>
+            <?php endif; ?>
         </div>
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
     </section>
@@ -652,6 +745,7 @@ $result = mysqli_query($connection, $query);
 
 
 
+<<<<<<< HEAD
 
 =======
 >>>>>>> b0afb19 (home,logout,cart,order)
@@ -660,3 +754,5 @@ $result = mysqli_query($connection, $query);
 
 
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
+=======
+>>>>>>> 16a93a9 (updatemyorder&cart)
