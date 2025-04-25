@@ -8,43 +8,14 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// حساب عدد العناصر في السلة
-$cart_count = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
-
-// جلب الطلبات الخاصة بالمستخدم الحالي
 $user_id = $_SESSION['user_id'];
+
+// جلب الأوردارات بتاعة المستخدم
 $query = "SELECT orders.*, items.name AS item_name, items.price AS item_price 
           FROM orders 
           JOIN items ON orders.item_id = items.id 
-          WHERE orders.user_id = ? 
-          ORDER BY orders.order_date DESC";
-$stmt = mysqli_prepare($connection, $query);
-mysqli_stmt_bind_param($stmt, "i", $user_id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-
-// تجميع الطلبات بنفس الـ order_date و room_number
-$orders = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $order_key = $row['order_date'] . '|' . $row['room_number'];
-    if (!isset($orders[$order_key])) {
-        $orders[$order_key] = [
-            'order_date' => $row['order_date'],
-            'room_number' => $row['room_number'],
-            'status' => $row['status'],
-            'items' => [],
-            'total_price' => 0
-        ];
-    }
-    $orders[$order_key]['items'][] = [
-        'name' => $row['item_name'],
-        'quantity' => $row['quantity'],
-        'price' => $row['item_price'],
-        'subtotal' => $row['item_price'] * $row['quantity']
-    ];
-    $orders[$order_key]['total_price'] += $row['item_price'] * $row['quantity'];
-}
-mysqli_stmt_close($stmt);
+          WHERE orders.user_id = $user_id";
+$result = mysqli_query($connection, $query);
 ?>
 
 <!DOCTYPE html>
@@ -52,22 +23,13 @@ mysqli_stmt_close($stmt);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feane Cafeteria - My Orders</title>
+    <title>My Orders - Feane Cafeteria</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
-        body {
-            background-color: #F5F5DC;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
         /* Navigation Bar */
         .navbar {
             background-color: transparent;
@@ -93,69 +55,16 @@ mysqli_stmt_close($stmt);
         .navbar .btn-order-online:hover {
             background-color: #6d3e1a;
         }
-        .cart-icon {
-            position: relative;
-            margin-left: 10px;
-        }
-        .cart-icon i {
-            font-size: 1.5rem;
-            color: white;
-        }
-        .cart-icon .cart-count {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background-color: #8d5524;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.8rem;
-        }
 
         /* Orders Section */
         .orders-section {
-            background-color: #5C4033;
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin: 100px auto 30px auto;
-            max-width: 800px;
+            padding: 50px 0;
+            background-color: #F5F5DC;
         }
-        .orders-section h3 {
+        .heading_container h2 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #8d5524;
-            padding-bottom: 10px;
+            color: #5C4033;
             text-align: center;
-        }
-        .order {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .order:last-child {
-            border-bottom: none;
-        }
-        .order-details {
-            margin-bottom: 10px;
-        }
-        .order-details p {
-            margin: 5px 0;
-        }
-        .order-items {
-            margin-left: 20px;
-        }
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-        }
-        .order-item span {
-            color: #d2b48c;
-        }
-        .status-confirmed {
-            color: #d2b48c;
-            font-weight: bold;
         }
 
         /* Footer */
@@ -201,16 +110,7 @@ mysqli_stmt_close($stmt);
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <span class="text-white me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
-                        <a href="logout.php" class="btn btn-order-online">Logout</a>
-                    <?php else: ?>
-                        <a href="login.php" class="btn btn-order-online">Login</a>
-                    <?php endif; ?>
-                    <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
-                        <i class="bi bi-cart"></i>
-                        <span class="cart-count"><?php echo $cart_count; ?></span>
-                    </a>
+                    <a href="logout.php" class="btn btn-order-online">Logout</a>
                 </div>
             </div>
         </div>
@@ -218,31 +118,39 @@ mysqli_stmt_close($stmt);
 
     <!-- Orders Section -->
     <section class="orders-section">
-        <h3>My Orders</h3>
-        <?php if (count($orders) > 0): ?>
-            <?php foreach ($orders as $order): ?>
-                <div class="order">
-                    <div class="order-details">
-                        <p><strong>Order Date:</strong> <?php echo htmlspecialchars($order['order_date']); ?></p>
-                        <p><strong>Room Number:</strong> <?php echo htmlspecialchars($order['room_number']); ?></p>
-                        <p><strong>Status:</strong> <span class="status-confirmed"><?php echo htmlspecialchars($order['status']); ?></span></p>
-                    </div>
-                    <div class="order-items">
-                        <?php foreach ($order['items'] as $item): ?>
-                            <div class="order-item">
-                                <span><?php echo htmlspecialchars($item['name']); ?> (x<?php echo $item['quantity']; ?>)</span>
-                                <span>$<?php echo number_format($item['subtotal'], 2); ?></span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="order-details">
-                        <p><strong>Total:</strong> $<?php echo number_format($order['total_price'], 2); ?></p>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>You have no orders yet.</p>
-        <?php endif; ?>
+        <div class="container">
+            <div class="heading_container">
+                <h2>My Orders</h2>
+            </div>
+            <table class="table">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Room Number</th>
+                    <th>Status</th>
+                    <th>Order Date</th>
+                    <th>Delete</th>
+                    <th>Edit</th>
+                </tr>
+                <?php while ($order = mysqli_fetch_assoc($result)) : ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($order['id']); ?></td>
+                        <td><?php echo htmlspecialchars($order['item_name']); ?></td>
+                        <td>$<?php echo htmlspecialchars($order['item_price']); ?></td>
+                        <td><?php echo htmlspecialchars($order['quantity']); ?></td>
+                        <td>$<?php echo htmlspecialchars($order['quantity'] * $order['item_price']); ?></td>
+                        <td><?php echo htmlspecialchars($order['room_number']); ?></td>
+                        <td><?php echo htmlspecialchars($order['status']); ?></td>
+                        <td><?php echo htmlspecialchars($order['order_date']); ?></td>
+                        <td><a href="delete_order.php?orderid=<?php echo $order['id']; ?>" class="btn btn-danger">Delete</a></td>
+                        <td><a href="edit_order.php?orderid=<?php echo $order['id']; ?>" class="btn btn-warning">Edit</a></td>
+                    </tr>
+                <?php endwhile; ?>
+            </table>
+        </div>
     </section>
 
     <!-- Footer -->
@@ -254,9 +162,12 @@ mysqli_stmt_close($stmt);
     </footer>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 </body>
 </html>
+
+
+
 
 
 
