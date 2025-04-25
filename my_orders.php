@@ -77,6 +77,12 @@ $result = mysqli_stmt_get_result($stmt);
 
 $user_id = $_SESSION['user_id'];
 
+// حساب عدد العناصر في السلة لو كانت موجودة
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+$cart_count = array_sum($_SESSION['cart']);
+
 // عدد الأوردارات في كل صفحة
 $orders_per_page = 5;
 
@@ -164,6 +170,7 @@ $result = mysqli_query($connection, $query);
             z-index: 3;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         .navbar .navbar-brand {
             color: #d2b48c; /* درجة بني فاتحة عشان كلمة Feane تبقى واضحة */
         }
@@ -174,13 +181,22 @@ $result = mysqli_query($connection, $query);
         .navbar .nav-link:hover {
             color: #6d3e1a;
 =======
+=======
+        .navbar .navbar-brand {
+            color: #d2b48c; /* درجة بني فاتحة عشان كلمة Feane تبقى واضحة */
+        }
+>>>>>>> 0fd8969 (lastupdate)
         .navbar .nav-link {
-            color: white;
+            color: #8d5524; /* درجة بني غامق وواضح */
             margin: 0 15px;
         }
         .navbar .nav-link:hover {
+<<<<<<< HEAD
             color: #8d5524;
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+            color: #6d3e1a;
+>>>>>>> 0fd8969 (lastupdate)
         }
         .navbar .btn-order-online {
             background-color: #8d5524;
@@ -194,11 +210,17 @@ $result = mysqli_query($connection, $query);
         }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         .navbar .welcome-text {
             color: #8d5524; /* نفس لون الروابط */
         }
 =======
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+        .navbar .welcome-text {
+            color: #8d5524; /* نفس لون الروابط */
+        }
+>>>>>>> 0fd8969 (lastupdate)
         .cart-icon {
             position: relative;
             margin-left: 10px;
@@ -206,10 +228,14 @@ $result = mysqli_query($connection, $query);
         .cart-icon i {
             font-size: 1.5rem;
 <<<<<<< HEAD
+<<<<<<< HEAD
             color: #d2b48c; /* درجة بني فاتحة عشان الأيقونة تبان */
 =======
             color: white;
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+            color: #d2b48c; /* درجة بني فاتحة عشان الأيقونة تبان */
+>>>>>>> 0fd8969 (lastupdate)
         }
         .cart-icon .cart-count {
             position: absolute;
@@ -382,10 +408,14 @@ $result = mysqli_query($connection, $query);
     <nav class="navbar navbar-expand-lg">
         <div class="container">
 <<<<<<< HEAD
+<<<<<<< HEAD
             <a class="navbar-brand" href="#">Feane</a>
 =======
             <a class="navbar-brand text-white" href="#">Feane</a>
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+            <a class="navbar-brand" href="#">Feane</a>
+>>>>>>> 0fd8969 (lastupdate)
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -413,6 +443,7 @@ $result = mysqli_query($connection, $query);
                 <div class="d-flex align-items-center">
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                     <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
 =======
@@ -423,13 +454,20 @@ $result = mysqli_query($connection, $query);
                         <a href="login.php" class="btn btn-order-online">Login</a>
                     <?php endif; ?>
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+                    <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+                    <a href="logout.php" class="btn btn-order-online">Logout</a>
+>>>>>>> 0fd8969 (lastupdate)
                     <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
                         <i class="bi bi-cart"></i>
                         <span class="cart-count"><?php echo $cart_count; ?></span>
                     </a>
+<<<<<<< HEAD
 =======
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
+=======
+>>>>>>> 0fd8969 (lastupdate)
                 </div>
             </div>
         </div>
@@ -746,6 +784,7 @@ $result = mysqli_query($connection, $query);
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> b0afb19 (home,logout,cart,order)
@@ -756,3 +795,6 @@ $result = mysqli_query($connection, $query);
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
 =======
 >>>>>>> 16a93a9 (updatemyorder&cart)
+=======
+
+>>>>>>> 0fd8969 (lastupdate)
