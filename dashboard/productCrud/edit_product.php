@@ -6,7 +6,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     exit();
 }
 
-$product_id = intval($_GET['id']);
+$product_id = $_GET['id'];
 
 $product_query = "SELECT * FROM items WHERE id = $product_id";
 $product_result = mysqli_query($myConnection, $product_query);
@@ -22,27 +22,28 @@ $categories_query = "SELECT * FROM categories";
 $categories_result = mysqli_query($myConnection, $categories_query);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
-    $name = mysqli_real_escape_string($myConnection, $_POST['name']);
-    $description = mysqli_real_escape_string($myConnection, $_POST['description']);
-    $price = floatval($_POST['price']);
-    $stock = intval($_POST['stock']);
-    $category_id = intval($_POST['category']);
+    $name = $_POST['name'];
+    $description =$_POST['description'];
+    $price = $_POST['price'];
+    $stock = $_POST['stock'];
+    $category_id = $_POST['category'];
     
     $image_path = $product['image_url'];
     
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+    if (isset($_FILES['image'])) {
         $fileName = $_FILES['image']['name'];
         $fileTmp = $_FILES['image']['tmp_name'];
         $fileSize = $_FILES['image']['size'];
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'svg'];
+        $fileArray = explode(".", $fileName);
+        $lastElementExt = strtolower(end($fileArray)); 
+        $arr = ["png", "jpg", "gif", "svg"];
         
-        if (in_array($fileExt, $allowed) && $fileSize < 5000000) {
+        if (in_array($lastElementExt, $arr) && $fileSize < 5000000) {
             $fileNameNew = uniqid('', true).'.'.$fileExt;
-            $fileDestinationn = '../uploads/products/'.$fileNameNew;
+            $UpdatedImage = '../uploads/products/'.time().$fileName;
             
-            if (move_uploaded_file($fileTmp, $fileDestinationn)) {
-                $image_path = $fileDestinationn;
+            if (move_uploaded_file($fileTmp, $UpdatedImage)) {
+                $image_path = $UpdatedImage;
             }
         }
     }

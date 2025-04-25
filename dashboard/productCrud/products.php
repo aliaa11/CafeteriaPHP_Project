@@ -3,7 +3,7 @@
     if (!$myConnection) {
       die("Database connection failed");
   }
-  $items_per_page = 3; 
+  $items_per_page = 6; 
   $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
   if ($current_page < 1) $current_page = 1;
   $offset = ($current_page - 1) * $items_per_page;
@@ -19,13 +19,20 @@
     <style>
         .product-card {
             transition: transform 0.2s;
+            overflow:hidden;
         }
         .product-card:hover {
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .product-img {
-            height: 200px;
+            height: 300px;
             object-fit: cover;
+            transition: transform 0.5s;
+
+        }
+        .product-img:hover {
+            transform : scale(1.1);
+         
         }
     </style>
 </head>
@@ -106,11 +113,11 @@
                             <p class="text-muted">Category: <?= $product['category_name'] ?></p>
                         </div>
                         <div class="card-footer bg-transparent">
-                            <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn btn-sm btn-primary me-2">Edit</a>
+                            <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn  btn-primary me-2">Edit</a>
                             <?php if($is_out_of_stock): ?>
-                                <button class="btn btn-sm btn-danger" disabled>Delete</button>
+                                <button class="btn  btn-danger" disabled>Delete</button>
                             <?php else: ?>
-                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $product['id'] ?>">Delete</button>
+                                <button class="btn  btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $product['id'] ?>">Delete</button>
                                 <!-- Delete Confirmation Modal -->
                             <div class="modal fade" id="deleteModal<?= $product['id'] ?>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
