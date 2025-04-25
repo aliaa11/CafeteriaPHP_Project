@@ -7,6 +7,9 @@ CREATE TABLE users (
   role ENUM('user', 'admin') DEFAULT 'user',
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 737bf18 (Update DB.txt)
  profile_picture VARCHAR(255) DEFAULT '../uploads/users/default.png';
 =======
 ADD COLUMN room_number VARCHAR(10),
