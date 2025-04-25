@@ -10,6 +10,12 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// حساب عدد العناصر في السلة لو كانت موجودة
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+$cart_count = array_sum($_SESSION['cart']);
+
 // عدد الأوردارات في كل صفحة
 $orders_per_page = 5;
 
@@ -68,12 +74,15 @@ $result = mysqli_query($connection, $query);
             width: 100%;
             z-index: 3;
         }
+        .navbar .navbar-brand {
+            color: #d2b48c; /* درجة بني فاتحة عشان كلمة Feane تبقى واضحة */
+        }
         .navbar .nav-link {
-            color: white;
+            color: #8d5524; /* درجة بني غامق وواضح */
             margin: 0 15px;
         }
         .navbar .nav-link:hover {
-            color: #8d5524;
+            color: #6d3e1a;
         }
         .navbar .btn-order-online {
             background-color: #8d5524;
@@ -84,6 +93,27 @@ $result = mysqli_query($connection, $query);
         }
         .navbar .btn-order-online:hover {
             background-color: #6d3e1a;
+        }
+        .navbar .welcome-text {
+            color: #8d5524; /* نفس لون الروابط */
+        }
+        .cart-icon {
+            position: relative;
+            margin-left: 10px;
+        }
+        .cart-icon i {
+            font-size: 1.5rem;
+            color: #d2b48c; /* درجة بني فاتحة عشان الأيقونة تبان */
+        }
+        .cart-icon .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #8d5524;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
         }
 
         /* Orders Section */
@@ -189,7 +219,7 @@ $result = mysqli_query($connection, $query);
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand text-white" href="#">Feane</a>
+            <a class="navbar-brand" href="#">Feane</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -212,7 +242,12 @@ $result = mysqli_query($connection, $query);
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
+                    <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
+                    <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
+                        <i class="bi bi-cart"></i>
+                        <span class="cart-count"><?php echo $cart_count; ?></span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -309,6 +344,7 @@ $result = mysqli_query($connection, $query);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 </body>
 </html>
+
 
 
 
