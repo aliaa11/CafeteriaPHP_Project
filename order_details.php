@@ -246,6 +246,7 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
                 <a href="my_orders.php" class="btn btn-primary">Back to My Orders</a>
                 <?php if ($order['status'] == 'pending'): ?>
 <<<<<<< HEAD
+<<<<<<< HEAD
                     <button type="button" class="btn btn-warning" id="updateOrderBtn">Update Order</button>
                 <?php endif; ?>
             </div>
@@ -312,12 +313,75 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
 </script>
 =======
                     <a href="cancel_order.php?order_id=<?php echo $order_id; ?>" class="btn btn-danger">Cancel Order</a>
+=======
+                    <button type="button" class="btn btn-warning" id="updateOrderBtn">Update Order</button>
+>>>>>>> f3c3ffe (order status done)
                 <?php endif; ?>
             </div>
+            <div class="modal fade" id="updateOrderModal" tabindex="-1" aria-labelledby="updateOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateOrderModalLabel">Update Order #<?= $order['id'] ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="edit_order.php" method="post">
+                <input type="hidden" name="order_id" value="<?= $order_id ?>">
+                <div class="modal-body">
+                    <div class="mb-3">
+                    <label for="room_number" class="form-label">Room Number</label>
+                            <select name="room" id="room_number" class="form-select" required>
+                                <option value="">Select Room</option>
+                                <option value="101">101</option>
+                                <option value="102">102</option>
+                                <option value="103">103</option>
+                                <option value="104">104</option>
+                                <option value="105">105</option>
+                            </select>
+                    </div>
+                    
+                    <h5>Order Items</h5>
+                    <?php foreach ($items as $item): ?>
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6><?= htmlspecialchars($item['name']) ?></h6>
+                                        <p><?= htmlspecialchars($item['description']) ?></p>
+                                        <p>Price: <?= number_format($item['price'], 2) ?> EGP</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="quantity_<?= $item['id'] ?>" class="form-label">Quantity</label>
+                                        <input type="number" class="form-control" 
+                                               id="quantity_<?= $item['id'] ?>" 
+                                               name="quantities[<?= $item['id'] ?>]" 
+                                               value="<?= $item['quantity'] ?>" min="1" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<<<<<<< HEAD
 >>>>>>> 000af98 (order status done)
+=======
+    <script>
+    // Show update modal when button is clicked
+    document.getElementById('updateOrderBtn').addEventListener('click', function() {
+        var updateModal = new bootstrap.Modal(document.getElementById('updateOrderModal'));
+        updateModal.show();
+    });
+</script>
+>>>>>>> f3c3ffe (order status done)
 </body>
 </html>
