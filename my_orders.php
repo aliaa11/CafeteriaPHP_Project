@@ -267,7 +267,29 @@ $result = mysqli_stmt_get_result($stmt);
                 <h2>My Orders</h2>
             </div>
 
-            <!-- Date Range Filter Form (keep existing) -->
+            <div class="row mb-4">
+    <div class="col-md-6">
+        <form method="GET" class="row g-3">
+            <div class="col-md-5">
+                <label for="date_from" class="form-label">From Date</label>
+                <input type="date" class="form-control" id="date_from" name="date_from" 
+                       value="<?= htmlspecialchars($date_from) ?>">
+            </div>
+            <div class="col-md-5">
+                <label for="date_to" class="form-label">To Date</label>
+                <input type="date" class="form-control" id="date_to" name="date_to" 
+                       value="<?= htmlspecialchars($date_to) ?>">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <?php if ($date_from || $date_to): ?>
+                    <a href="my_orders.php" class="btn btn-secondary ms-2">Clear</a>
+                <?php endif; ?>
+            </div>
+            <input type="hidden" name="page" value="1">
+        </form>
+    </div>
+</div>
 
             <?php if (mysqli_num_rows($result) > 0): ?>
                 <table class="table">
@@ -296,16 +318,77 @@ $result = mysqli_stmt_get_result($stmt);
                             </td>
                             <td><?= $order['order_date'] ?></td>
                             <td>
-                                <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-info btn-sm">View</a>
+                                <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-primary ">View</a>
                                 <?php if ($order['status'] == 'pending'): ?>
-                                    <a href="cancel_order.php?order_id=<?= $order['id'] ?>" class="btn btn-danger btn-sm">Cancel</a>
+                                    <a href="delete_order.php?order_id=<?= $order['id'] ?>" class="btn btn-danger p-2">Cancel</a>
                                 <?php endif; ?>
                             </td>
                         </tr>
                     <?php endwhile; ?>
                 </table>
 
-                <!-- Pagination (keep existing) -->
+                <?php if ($total_pages > 1): ?>
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <?php if ($current_page > 1): ?>
+                <li class="page-item">
+                    <a class="page-link" 
+                       href="?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>" 
+                       aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" 
+                       href="?<?= http_build_query(array_merge($_GET, ['page' => $current_page - 1])) ?>" 
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php 
+            // Show page numbers
+            $start_page = max(1, $current_page - 2);
+            $end_page = min($total_pages, $current_page + 2);
+            
+            if ($start_page > 1) {
+                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+            
+            for ($i = $start_page; $i <= $end_page; $i++): ?>
+                <li class="page-item <?= $i == $current_page ? 'active' : '' ?>">
+                    <a class="page-link" 
+                       href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>">
+                        <?= $i ?>
+                    </a>
+                </li>
+            <?php endfor; 
+            
+            if ($end_page < $total_pages) {
+                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+            ?>
+
+            <?php if ($current_page < $total_pages): ?>
+                <li class="page-item">
+                    <a class="page-link" 
+                       href="?<?= http_build_query(array_merge($_GET, ['page' => $current_page + 1])) ?>" 
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" 
+                       href="?<?= http_build_query(array_merge($_GET, ['page' => $total_pages])) ?>" 
+                       aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+<?php endif; ?>
             <?php else: ?>
                 <p>No orders found for the selected date range.</p>
             <?php endif; ?>
@@ -321,7 +404,26 @@ $result = mysqli_stmt_get_result($stmt);
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateFrom = document.getElementById('date_from');
+        const dateTo = document.getElementById('date_to');
+        
+        if (dateFrom && dateTo) {
+            dateFrom.addEventListener('change', function() {
+                if (this.value && dateTo.value && this.value > dateTo.value) {
+                    dateTo.value = this.value;
+                }
+            });
+            
+            dateTo.addEventListener('change', function() {
+                if (this.value && dateFrom.value && this.value < dateFrom.value) {
+                    dateFrom.value = this.value;
+                }
+            });
+        }
+    });
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 </body>
 </html>
