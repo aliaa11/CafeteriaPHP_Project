@@ -2,11 +2,6 @@
 session_start();
 include_once 'db.php';
 
-// إنشاء جلسة للسلة لو مش موجودة
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
-
 // التأكد من إن المستخدم مسجل دخول
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -14,6 +9,22 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+
+// إنشاء جلسة للسلة لو مش موجودة
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+// جلب أحدث أوردار للمستخدم
+$latest_order_query = "SELECT orders.*, SUM(items.price * orders.quantity) as total_price 
+                       FROM orders 
+                       JOIN items ON orders.item_id = items.id 
+                       WHERE orders.user_id = $user_id 
+                       GROUP BY orders.id 
+                       ORDER BY orders.order_date DESC 
+                       LIMIT 1";
+$latest_order_result = mysqli_query($connection, $latest_order_query);
+$latest_order = mysqli_fetch_assoc($latest_order_result);
 
 // تعديل الكمية في السلة
 if (isset($_POST['update_quantity'])) {
@@ -127,13 +138,34 @@ $cart_count = array_sum($_SESSION['cart']);
             font-size: 0.8rem;
         }
 
+        /* Latest Order Section */
+        .latest-order {
+            background-color: #5C4033;
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 80px auto 20px auto;
+            max-width: 600px;
+        }
+        .latest-order h5 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #8d5524;
+            padding-bottom: 5px;
+        }
+        .latest-order p {
+            margin: 5px 0;
+            color: #d2b48c;
+        }
+
         /* Cart Section */
         .cart-section {
             background-color: #5C4033;
             color: white;
             padding: 30px;
             border-radius: 15px;
-            margin: 100px auto 30px auto;
+            margin: 20px auto 30px auto;
             max-width: 600px;
         }
         .cart-section h3 {
@@ -320,6 +352,16 @@ $cart_count = array_sum($_SESSION['cart']);
         </div>
     </nav>
 
+    <!-- Latest Order Section -->
+    <?php if ($latest_order): ?>
+        <section class="latest-order">
+            <h5>Latest Order</h5>
+            <p><strong>Date:</strong> <?php echo htmlspecialchars($latest_order['order_date']); ?></p>
+            <p><strong>Status:</strong> <?php echo htmlspecialchars($latest_order['status']); ?></p>
+            <p><strong>Total:</strong> <?php echo htmlspecialchars($latest_order['total_price']); ?> EGP</p>
+        </section>
+    <?php endif; ?>
+
     <!-- Cart Section -->
     <section class="cart-section">
         <h3>Your Cart</h3>
@@ -345,7 +387,7 @@ $cart_count = array_sum($_SESSION['cart']);
                 <?php endif; ?>
                 <div class="cart-item-details">
                     <h6><?php echo htmlspecialchars($item['name']); ?></h6>
-                    <div class="subtotal">$<?php echo $subtotal; ?></div>
+                    <div class="subtotal"><?php echo $subtotal; ?> EGP</div>
                 </div>
                 <div class="quantity-controls">
                     <form method="post" style="display: inline;">
@@ -371,7 +413,7 @@ $cart_count = array_sum($_SESSION['cart']);
         }
         ?>
         <div class="total-price">
-            Total: $<span id="total-price"><?php echo number_format($total_price, 2); ?></span>
+            Total: <span id="total-price"><?php echo number_format($total_price, 2); ?> EGP</span>
         </div>
 
         <!-- Order Now Button to Open Modal -->
@@ -404,14 +446,14 @@ $cart_count = array_sum($_SESSION['cart']);
                             <div class="cart-item">
                                 <span><?php echo htmlspecialchars($item['name']); ?></span>
                                 <span class="cart-quantity"><?php echo $quantity; ?></span>
-                                <span>$<?php echo $subtotal; ?></span>
+                                <span><?php echo $subtotal; ?> EGP</span>
                             </div>
                         <?php
                             }
                         }
                         ?>
                         <div class="total-price">
-                            Total: $<span><?php echo number_format($modal_total_price, 2); ?></span>
+                            Total: <span><?php echo number_format($modal_total_price, 2); ?> EGP</span>
                         </div>
 
                         <!-- Room Number Dropdown -->
@@ -449,6 +491,3 @@ $cart_count = array_sum($_SESSION['cart']);
 </body>
 </html>
 
-<?php
-mysqli_close($connection);
-?>
