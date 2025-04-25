@@ -102,12 +102,15 @@ $cart_count = array_sum($_SESSION['cart']);
             width: 100%;
             z-index: 3;
         }
+        .navbar .navbar-brand {
+            color: #d2b48c; /* درجة بني فاتحة عشان كلمة Feane تبقى واضحة */
+        }
         .navbar .nav-link {
-            color: white;
+            color: #8d5524; /* درجة بني غامق وواضح */
             margin: 0 15px;
         }
         .navbar .nav-link:hover {
-            color: #8d5524;
+            color: #6d3e1a;
         }
         .navbar .btn-order-online {
             background-color: #8d5524;
@@ -119,13 +122,16 @@ $cart_count = array_sum($_SESSION['cart']);
         .navbar .btn-order-online:hover {
             background-color: #6d3e1a;
         }
+        .navbar .welcome-text {
+            color: #8d5524; /* نفس لون الروابط */
+        }
         .cart-icon {
             position: relative;
             margin-left: 10px;
         }
         .cart-icon i {
             font-size: 1.5rem;
-            color: white;
+            color: #d2b48c; /* درجة بني فاتحة عشان الأيقونة تبان */
         }
         .cart-icon .cart-count {
             position: absolute;
@@ -219,9 +225,14 @@ $cart_count = array_sum($_SESSION['cart']);
             align-items: center;
             justify-content: center;
         }
-        .quantity-controls button:hover {
-            background-color: #6d3e1a;
+        /* شيلنا تأثير الـ Hover */
+        .cart-section .btn-danger {
+            background-color: #8d5524;
+            border: none;
+            border-radius: 25px;
+            padding: 5px 10px;
         }
+        /* شيلنا تأثير الـ Hover */
         .cart-section .total-price {
             font-size: 1.2rem;
             font-weight: bold;
@@ -318,7 +329,7 @@ $cart_count = array_sum($_SESSION['cart']);
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand text-white" href="#">Feane</a>
+            <a class="navbar-brand" href="#">Feane</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -341,7 +352,7 @@ $cart_count = array_sum($_SESSION['cart']);
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <span class="text-white me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+                    <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
                     <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
                         <i class="bi bi-cart"></i>
@@ -490,4 +501,11 @@ $cart_count = array_sum($_SESSION['cart']);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
 
