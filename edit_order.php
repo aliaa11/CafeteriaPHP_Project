@@ -1,10 +1,14 @@
 <?php
 session_start();
 <<<<<<< HEAD
+<<<<<<< HEAD
 include_once './config/dbConnection.php';
 
 =======
 include_once 'db.php';
+=======
+include_once './config/dbConnection.php';
+>>>>>>> 000af98 (order status done)
 
 // التأكد من إن المستخدم مسجل دخول
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
@@ -23,7 +27,7 @@ $query = "SELECT orders.*, items.name AS item_name, items.price AS item_price
           FROM orders 
           JOIN items ON orders.item_id = items.id 
           WHERE orders.id = $order_id AND orders.user_id = $user_id";
-$order_result = mysqli_query($connection, $query);
+$order_result = mysqli_query($myConnection, $query);
 $order = mysqli_fetch_assoc($order_result);
 
 if (!$order) {
@@ -77,7 +81,7 @@ if (isset($_POST['btn'])) {
     $room_number = $_POST['room_number'];
 
     $update_query = "UPDATE orders SET quantity = $quantity, room_number = '$room_number' WHERE id = $order_id AND user_id = $user_id";
-    mysqli_query($connection, $update_query);
+    mysqli_query($myConnection, $update_query);
     header("Location: my_orders.php");
     exit();
 }

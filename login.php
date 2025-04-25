@@ -1,10 +1,14 @@
 <?php
 session_start();
 <<<<<<< HEAD
+<<<<<<< HEAD
 include_once './config/dbConnection.php';
 =======
 include_once 'db.php';
 >>>>>>> 63d3ef8 (my work for cafeteria project)
+=======
+include_once './config/dbConnection.php';
+>>>>>>> 000af98 (order status done)
 
 $errors = [];
 
@@ -36,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 >>>>>>> 63d3ef8 (my work for cafeteria project)
 =======
         $query = "SELECT * FROM users WHERE email = ?";
-        $stmt = mysqli_prepare($connection, $query);
+        $stmt = mysqli_prepare($myConnection, $query);
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);

@@ -1,10 +1,14 @@
 <?php
 session_start();
 <<<<<<< HEAD
+<<<<<<< HEAD
 include_once './config/dbConnection.php';
 
 =======
 include_once 'db.php';
+=======
+include_once './config/dbConnection.php';
+>>>>>>> 000af98 (order status done)
 
 // التأكد من إن المستخدم مسجل دخول
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
@@ -56,11 +60,15 @@ $user_id = $_SESSION['user_id'];
 $order_id = $_GET['orderid'];
 
 $delete_query = "DELETE FROM orders WHERE id = $order_id AND user_id = $user_id";
-mysqli_query($connection, $delete_query);
+mysqli_query($myConnection, $delete_query);
 
 header("Location: my_orders.php");
 exit();
 
+<<<<<<< HEAD
 mysqli_close($connection);
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
+=======
+mysqli_close($myConnection);
+>>>>>>> 000af98 (order status done)
 ?>

@@ -152,10 +152,13 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
             background-color: #17A2B8;
             color: #FFF;
         }
+<<<<<<< HEAD
         .item-image
         {
             width:100px;
         }
+=======
+>>>>>>> 000af98 (order status done)
     </style>
 </head>
 <body>
@@ -209,6 +212,7 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
                 <?php foreach ($items as $item): ?>
                     <div class="order-item">
                         <div>
+<<<<<<< HEAD
                         <?php if (!empty($item['image_url'])): ?>
                             <img class='item-image' src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/<?= htmlspecialchars($item['image_url']) ?> " 
                                     alt="<?= htmlspecialchars($item['name']) ?>"
@@ -220,6 +224,8 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
                             <?php endif; ?>
                         </div>
                         <div>
+=======
+>>>>>>> 000af98 (order status done)
                             <h5><?= htmlspecialchars($item['name']) ?></h5>
                             <p><?= htmlspecialchars($item['description']) ?></p>
                         </div>
@@ -239,6 +245,7 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
             <div class="mt-4">
                 <a href="my_orders.php" class="btn btn-primary">Back to My Orders</a>
                 <?php if ($order['status'] == 'pending'): ?>
+<<<<<<< HEAD
                     <button type="button" class="btn btn-warning" id="updateOrderBtn">Update Order</button>
                 <?php endif; ?>
             </div>
@@ -303,5 +310,14 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
         updateModal.show();
     });
 </script>
+=======
+                    <a href="cancel_order.php?order_id=<?php echo $order_id; ?>" class="btn btn-danger">Cancel Order</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+>>>>>>> 000af98 (order status done)
 </body>
 </html>

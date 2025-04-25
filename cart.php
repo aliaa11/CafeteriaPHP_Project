@@ -1,6 +1,7 @@
 <?php
 session_start();
 <<<<<<< HEAD
+<<<<<<< HEAD
 include_once './config/dbConnection.php';
 
 =======
@@ -8,6 +9,10 @@ include_once 'db.php';
 
 // التأكد من إن المستخدم مسجل دخول
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+include_once './config/dbConnection.php';
+
+>>>>>>> 000af98 (order status done)
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -18,17 +23,23 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 // إنشاء جلسة للسلة لو مش موجودة
 >>>>>>> 16a93a9 (updatemyorder&cart)
+=======
+>>>>>>> 000af98 (order status done)
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 // جلب أحدث أوردار للمستخدم
 >>>>>>> 16a93a9 (updatemyorder&cart)
+=======
+>>>>>>> 000af98 (order status done)
 $latest_order_query = "SELECT orders.*, SUM(items.price * orders.quantity) as total_price 
                        FROM orders 
                        JOIN items ON orders.item_id = items.id 
@@ -36,6 +47,7 @@ $latest_order_query = "SELECT orders.*, SUM(items.price * orders.quantity) as to
                        GROUP BY orders.id 
                        ORDER BY orders.order_date DESC 
                        LIMIT 1";
+<<<<<<< HEAD
 <<<<<<< HEAD
 $latest_order_result = mysqli_query($myConnection, $latest_order_query);
 $latest_order = mysqli_fetch_assoc($latest_order_result);
@@ -52,6 +64,11 @@ $latest_order = mysqli_fetch_assoc($latest_order_result);
 >>>>>>> 16a93a9 (updatemyorder&cart)
 // تعديل الكمية في السلة
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+$latest_order_result = mysqli_query($myConnection, $latest_order_query);
+$latest_order = mysqli_fetch_assoc($latest_order_result);
+
+>>>>>>> 000af98 (order status done)
 if (isset($_POST['update_quantity'])) {
     $item_id = $_POST['item_id'];
     $action = $_POST['action'];
@@ -68,9 +85,12 @@ if (isset($_POST['update_quantity'])) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 // إزالة منتج من السلة
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+>>>>>>> 000af98 (order status done)
 if (isset($_POST['remove_from_cart'])) {
     $item_id = $_POST['remove_from_cart'];
     unset($_SESSION['cart'][$item_id]);
@@ -78,6 +98,7 @@ if (isset($_POST['remove_from_cart'])) {
     exit();
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 // Confirm order processing
 if (isset($_POST['confirm_order'])) {
@@ -117,29 +138,49 @@ $cart_count = array_sum($_SESSION['cart']);
 ?>
 =======
 // تسجيل الطلب لما نضغط "Confirm" في الـ Modal
+=======
+// Confirm order processing
+>>>>>>> 000af98 (order status done)
 if (isset($_POST['confirm_order'])) {
     $room_number = $_POST['room'];
     $cart_items = $_SESSION['cart'];
-
-    // إضافة سجل لكل منتج في جدول orders
-    foreach ($cart_items as $item_id => $quantity) {
-        $query = "INSERT INTO orders (user_id, item_id, quantity, status, room_number) VALUES ($user_id, $item_id, $quantity, 'confirmed', '$room_number')";
-        mysqli_query($connection, $query);
-    }
-
-    // تفريغ السلة
-    $_SESSION['cart'] = [];
-
-    // إعادة توجيه المستخدم لصفحة My Orders
-    header("Location: my_orders.php");
-    exit();
+    
+    mysqli_begin_transaction($myConnection);
+    
+        $order_query = "INSERT INTO orders (user_id, status, room_number) 
+                       VALUES (?, 'pending', ?)";
+        $stmt = mysqli_prepare($myConnection, $order_query);
+        mysqli_stmt_bind_param($stmt, "is", $_SESSION['user_id'], $room_number);
+        mysqli_stmt_execute($stmt);
+        $order_id = mysqli_insert_id($myConnection);
+        
+        // 2. Add all items to order_items
+        foreach ($cart_items as $item_id => $quantity) {
+            $item_query = "INSERT INTO order_items (order_id, item_id, quantity)
+                          VALUES (?, ?, ?)";
+            $stmt = mysqli_prepare($myConnection, $item_query);
+            mysqli_stmt_bind_param($stmt, "iii", $order_id, $item_id, $quantity);
+            mysqli_stmt_execute($stmt);
+            
+            if (mysqli_affected_rows($myConnection) === 0) {
+                throw new Exception("Failed to insert item $item_id");
+            }
+        }
+        
+        mysqli_commit($myConnection);
+        $_SESSION['cart'] = [];
+        header("Location: order_details.php?order_id=$order_id");
+        exit();
+        
+    
 }
-
-// حساب عدد العناصر في السلة
 $cart_count = array_sum($_SESSION['cart']);
 ?>
+<<<<<<< HEAD
 
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+>>>>>>> 000af98 (order status done)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -490,6 +531,7 @@ $cart_count = array_sum($_SESSION['cart']);
                     </li>
                     <li class="nav-item">
 <<<<<<< HEAD
+<<<<<<< HEAD
                         <a class="nav-link active" href="my_orders.php">MY ORDERS</a>
                     </li>
                 </ul>
@@ -504,6 +546,9 @@ $cart_count = array_sum($_SESSION['cart']);
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="my_orders.php">MY ORDERS</a>
+=======
+                        <a class="nav-link active" href="my_orders.php">MY ORDERS</a>
+>>>>>>> 000af98 (order status done)
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
@@ -620,7 +665,7 @@ $cart_count = array_sum($_SESSION['cart']);
         if (!empty($_SESSION['cart'])) {
             foreach ($_SESSION['cart'] as $item_id => $quantity) {
                 $item_query = "SELECT * FROM items WHERE id = $item_id";
-                $item_result = mysqli_query($connection, $item_query);
+                $item_result = mysqli_query($myConnection, $item_query);
                 $item = mysqli_fetch_assoc($item_result);
 
                 $subtotal = $item['price'] * $quantity;
@@ -666,14 +711,16 @@ $cart_count = array_sum($_SESSION['cart']);
             Total: <span id="total-price"><?php echo number_format($total_price, 2); ?> EGP</span>
         </div>
 
-        <!-- Order Now Button to Open Modal -->
         <?php if (!empty($_SESSION['cart'])): ?>
             <button type="button" class="btn btn-order" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">Order Now</button>
         <?php endif; ?>
     </section>
 
+<<<<<<< HEAD
     <!-- Confirm Order Modal -->
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+>>>>>>> 000af98 (order status done)
     <div class="modal fade" id="confirmOrderModal" tabindex="-1" aria-labelledby="confirmOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -703,7 +750,7 @@ $cart_count = array_sum($_SESSION['cart']);
 >>>>>>> b0afb19 (home,logout,cart,order)
 =======
                                 $item_query = "SELECT * FROM items WHERE id = $item_id";
-                                $item_result = mysqli_query($connection, $item_query);
+                                $item_result = mysqli_query($myConnection, $item_query);
                                 $item = mysqli_fetch_assoc($item_result);
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
 
@@ -762,9 +809,12 @@ $cart_count = array_sum($_SESSION['cart']);
     </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     <!-- Footer -->
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+>>>>>>> 000af98 (order status done)
     <footer>
         <div class="container">
             <p>© 2025 Feane Cafeteria. All Rights Reserved.</p>
