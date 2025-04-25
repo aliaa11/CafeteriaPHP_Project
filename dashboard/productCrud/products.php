@@ -87,7 +87,6 @@
                     $count_sql .= " WHERE c.name LIKE '%$search_term%'";
                 }
             }
-
             $sql .= " LIMIT $offset, $items_per_page";
             $count_result = mysqli_query($myConnection, $count_sql);
             $total_items = mysqli_fetch_assoc($count_result)['total'];
@@ -209,10 +208,11 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Category</label>
-                            <select class="form-select" name="category" required>
+                            <select class="form-select" name="category">
                                 <option value="" selected disabled>Select a category</option>
                                 <?php
                                 $categories = mysqli_query($myConnection, "SELECT * FROM categories");
+                                print_r($category);
                                 while($category = mysqli_fetch_assoc($categories)) {
                                     echo "<option value='{$category['id']}'>{$category['name']}</option>";
                                 }
@@ -250,7 +250,6 @@ if(isset($_POST['addProduct'])) {
         echo "<div class='alert alert-danger'>Please fill all required fields</div>";
         exit();
     }
-    
     if(isset($_FILES['image'])) {
         $fileName = $_FILES['image']['name'];
         $fileTmp = $_FILES['image']['tmp_name'];
