@@ -13,6 +13,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+$user_id = $_SESSION['user_id'];
+
 // تعديل الكمية في السلة
 if (isset($_POST['update_quantity'])) {
     $item_id = $_POST['item_id'];
@@ -41,15 +43,11 @@ if (isset($_POST['remove_from_cart'])) {
 if (isset($_POST['confirm_order'])) {
     $room_number = $_POST['room'];
     $cart_items = $_SESSION['cart'];
-    $user_id = $_SESSION['user_id'];
 
     // إضافة سجل لكل منتج في جدول orders
     foreach ($cart_items as $item_id => $quantity) {
-        $query = "INSERT INTO orders (user_id, item_id, quantity, status, room_number) VALUES (?, ?, ?, 'confirmed', ?)";
-        $stmt = mysqli_prepare($connection, $query);
-        mysqli_stmt_bind_param($stmt, "iiis", $user_id, $item_id, $quantity, $room_number);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
+        $query = "INSERT INTO orders (user_id, item_id, quantity, status, room_number) VALUES ($user_id, $item_id, $quantity, 'confirmed', '$room_number')";
+        mysqli_query($connection, $query);
     }
 
     // تفريغ السلة
@@ -311,12 +309,8 @@ $cart_count = array_sum($_SESSION['cart']);
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <span class="text-white me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
-                        <a href="logout.php" class="btn btn-order-online">Logout</a>
-                    <?php else: ?>
-                        <a href="login.php" class="btn btn-order-online">Login</a>
-                    <?php endif; ?>
+                    <span class="text-white me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+                    <a href="logout.php" class="btn btn-order-online">Logout</a>
                     <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
                         <i class="bi bi-cart"></i>
                         <span class="cart-count"><?php echo $cart_count; ?></span>
@@ -333,13 +327,9 @@ $cart_count = array_sum($_SESSION['cart']);
         $total_price = 0;
         if (!empty($_SESSION['cart'])) {
             foreach ($_SESSION['cart'] as $item_id => $quantity) {
-                $item_query = "SELECT * FROM items WHERE id = ?";
-                $stmt = mysqli_prepare($connection, $item_query);
-                mysqli_stmt_bind_param($stmt, "i", $item_id);
-                mysqli_stmt_execute($stmt);
-                $item_result = mysqli_stmt_get_result($stmt);
+                $item_query = "SELECT * FROM items WHERE id = $item_id";
+                $item_result = mysqli_query($connection, $item_query);
                 $item = mysqli_fetch_assoc($item_result);
-                mysqli_stmt_close($stmt);
 
                 $subtotal = $item['price'] * $quantity;
                 $total_price += $subtotal;
@@ -404,13 +394,9 @@ $cart_count = array_sum($_SESSION['cart']);
                         $modal_total_price = 0;
                         if (!empty($_SESSION['cart'])) {
                             foreach ($_SESSION['cart'] as $item_id => $quantity) {
-                                $item_query = "SELECT * FROM items WHERE id = ?";
-                                $stmt = mysqli_prepare($connection, $item_query);
-                                mysqli_stmt_bind_param($stmt, "i", $item_id);
-                                mysqli_stmt_execute($stmt);
-                                $item_result = mysqli_stmt_get_result($stmt);
+                                $item_query = "SELECT * FROM items WHERE id = $item_id";
+                                $item_result = mysqli_query($connection, $item_query);
                                 $item = mysqli_fetch_assoc($item_result);
-                                mysqli_stmt_close($stmt);
 
                                 $subtotal = $item['price'] * $quantity;
                                 $modal_total_price += $subtotal;
@@ -463,4 +449,6 @@ $cart_count = array_sum($_SESSION['cart']);
 </body>
 </html>
 
-
+<?php
+mysqli_close($connection);
+?>
