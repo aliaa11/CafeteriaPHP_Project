@@ -74,13 +74,10 @@ if (!isset($_SESSION['cart'])) {
 $user_data = null;
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $user_query = "SELECT username, profile_picture FROM users WHERE id = ?";
-    $stmt = mysqli_prepare($connection, $user_query);
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    mysqli_stmt_execute($stmt);
-    $user_result = mysqli_stmt_get_result($stmt);
+    // تعديل: استخدام mysqli_query بدل Prepared Statement
+    $user_query = "SELECT username, profile_picture FROM users WHERE id = $user_id";
+    $user_result = mysqli_query($connection, $user_query);
     $user_data = mysqli_fetch_assoc($user_result);
-    mysqli_stmt_close($stmt);
 }
 
 // إضافة منتج للسلة
@@ -100,18 +97,7 @@ if (isset($_POST['add_to_cart'])) {
         $_SESSION['cart'][$item_id] = $quantity;
     }
 
-    // تحديث عدد السلة
-    $cart_count = array_sum($_SESSION['cart']);
-
-    // التحقق إذا كان الطلب من AJAX
-    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-        // إرجاع عدد السلة الجديد كـ JSON
-        header('Content-Type: application/json');
-        echo json_encode(['cart_count' => $cart_count]);
-        exit();
-    }
-
-    // لو مش AJAX، اعمل redirect عادي
+    // تعديل: إلغاء AJAX واستخدام Redirect
     header("Location: home.php");
     exit();
 }
@@ -120,6 +106,8 @@ if (isset($_POST['add_to_cart'])) {
 if (isset($_POST['remove_from_cart'])) {
     $item_id = $_POST['remove_from_cart'];
     unset($_SESSION['cart'][$item_id]);
+    header("Location: home.php");
+    exit();
 }
 
 // جلب الفئات مع المنتجات
@@ -157,7 +145,7 @@ $cart_count = array_sum($_SESSION['cart']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feane Cafeteria - Home</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -660,7 +648,7 @@ $cart_count = array_sum($_SESSION['cart']);
             color: #d2b48c;
             text-decoration: none;
         }
-        .footer a:hover {
+        footer a:hover {
             color: #8d5524;
         }
     </style>
@@ -705,7 +693,7 @@ $cart_count = array_sum($_SESSION['cart']);
                     <?php else: ?>
                         <a href="login.php" class="btn btn-order-online">Login</a>
                     <?php endif; ?>
-                    <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
+                    <a href="cart.php" class="cart-icon">
                         <i class="bi bi-cart"></i>
                         <span class="cart-count"><?php echo $cart_count; ?></span>
                     </a>
@@ -757,7 +745,7 @@ $cart_count = array_sum($_SESSION['cart']);
                                             echo "<!-- Debug: Image path = " . $image_path . " -->";
                                             if (file_exists($image_path)):
                                             ?>
-                                                <img src="/cafateriapro/uploads/<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="order-item-img" onclick="addToCart(<?php echo $item['id']; ?>)">
+                                                <img src="/cafateriapro/uploads/<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="order-item-img">
                                             <?php else: ?>
                                                 <p>Image not available</p>
                                             <?php endif; ?>
@@ -796,7 +784,7 @@ $cart_count = array_sum($_SESSION['cart']);
     </footer>
 
     <!-- Bootstrap JS and Custom JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/isotope-layout@3.0.6/dist/isotope.pkgd.min.js"></script>
     <script>
@@ -818,36 +806,6 @@ $cart_count = array_sum($_SESSION['cart']);
                 $grid.isotope({ filter: filterValue });
             });
         });
-
-        // Add to Cart on Image Click or Button Click
-        function addToCart(itemId) {
-            <?php if (!isset($_SESSION['user_id'])): ?>
-                window.location.href = 'login.php';
-                return;
-            <?php endif; ?>
-
-            let formData = new FormData();
-            formData.append('item_id', itemId);
-            formData.append('quantity', 1);
-            formData.append('add_to_cart', true);
-
-            fetch(window.location.href, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                // تحديث عدد السلة في الـ Navbar
-                document.querySelector('.cart-count').textContent = data.cart_count;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                window.location.reload();
-            });
-        }
     </script>
 </body>
 </html>
@@ -858,6 +816,7 @@ $cart_count = array_sum($_SESSION['cart']);
 
 
 
+<<<<<<< HEAD
 
 
 
@@ -865,3 +824,5 @@ $cart_count = array_sum($_SESSION['cart']);
 
 
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)

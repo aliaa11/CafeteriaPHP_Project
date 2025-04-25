@@ -75,43 +75,14 @@ $result = mysqli_stmt_get_result($stmt);
 
 =======
 
-// حساب عدد العناصر في السلة
-$cart_count = isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0;
-
-// جلب الطلبات الخاصة بالمستخدم الحالي
 $user_id = $_SESSION['user_id'];
+
+// جلب الأوردارات بتاعة المستخدم
 $query = "SELECT orders.*, items.name AS item_name, items.price AS item_price 
           FROM orders 
           JOIN items ON orders.item_id = items.id 
-          WHERE orders.user_id = ? 
-          ORDER BY orders.order_date DESC";
-$stmt = mysqli_prepare($connection, $query);
-mysqli_stmt_bind_param($stmt, "i", $user_id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-
-// تجميع الطلبات بنفس الـ order_date و room_number
-$orders = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $order_key = $row['order_date'] . '|' . $row['room_number'];
-    if (!isset($orders[$order_key])) {
-        $orders[$order_key] = [
-            'order_date' => $row['order_date'],
-            'room_number' => $row['room_number'],
-            'status' => $row['status'],
-            'items' => [],
-            'total_price' => 0
-        ];
-    }
-    $orders[$order_key]['items'][] = [
-        'name' => $row['item_name'],
-        'quantity' => $row['quantity'],
-        'price' => $row['item_price'],
-        'subtotal' => $row['item_price'] * $row['quantity']
-    ];
-    $orders[$order_key]['total_price'] += $row['item_price'] * $row['quantity'];
-}
-mysqli_stmt_close($stmt);
+          WHERE orders.user_id = $user_id";
+$result = mysqli_query($connection, $query);
 ?>
 >>>>>>> b0afb19 (home,logout,cart,order)
 
@@ -121,6 +92,7 @@ mysqli_stmt_close($stmt);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <<<<<<< HEAD
+<<<<<<< HEAD
     <title>My Orders - Feane Cafeteria</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
@@ -129,10 +101,16 @@ mysqli_stmt_close($stmt);
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+    <title>My Orders - Feane Cafeteria</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
         body {
@@ -145,6 +123,8 @@ mysqli_stmt_close($stmt);
         }
 
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
         /* Navigation Bar */
         .navbar {
             background-color: transparent;
@@ -182,6 +162,7 @@ mysqli_stmt_close($stmt);
         .navbar .btn-order-online:hover {
             background-color: #6d3e1a;
         }
+<<<<<<< HEAD
 <<<<<<< HEAD
         .navbar .welcome-text {
             color: #8d5524; /* نفس لون الروابط */
@@ -300,15 +281,20 @@ mysqli_stmt_close($stmt);
             border-radius: 15px;
             margin: 100px auto 30px auto;
             max-width: 800px;
+=======
+
+        /* Orders Section */
+        .orders-section {
+            padding: 50px 0;
+            background-color: #F5F5DC;
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
         }
-        .orders-section h3 {
+        .heading_container h2 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #8d5524;
-            padding-bottom: 10px;
+            color: #5C4033;
             text-align: center;
         }
+<<<<<<< HEAD
         .order {
             padding: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -338,6 +324,8 @@ mysqli_stmt_close($stmt);
             font-weight: bold;
 >>>>>>> b0afb19 (home,logout,cart,order)
         }
+=======
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
 
         /* Footer */
         footer {
@@ -390,6 +378,7 @@ mysqli_stmt_close($stmt);
                 </ul>
                 <div class="d-flex align-items-center">
 <<<<<<< HEAD
+<<<<<<< HEAD
                     <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
 =======
@@ -404,6 +393,9 @@ mysqli_stmt_close($stmt);
                         <i class="bi bi-cart"></i>
                         <span class="cart-count"><?php echo $cart_count; ?></span>
                     </a>
+=======
+                    <a href="logout.php" class="btn btn-order-online">Logout</a>
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
                 </div>
             </div>
         </div>
@@ -412,10 +404,14 @@ mysqli_stmt_close($stmt);
     <!-- Orders Section -->
     <section class="orders-section">
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
         <div class="container">
             <div class="heading_container">
                 <h2>My Orders</h2>
             </div>
+<<<<<<< HEAD
 
             <div class="row mb-4">
     <div class="col-md-6">
@@ -572,6 +568,37 @@ mysqli_stmt_close($stmt);
         <?php else: ?>
             <p>You have no orders yet.</p>
         <?php endif; ?>
+=======
+            <table class="table">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Room Number</th>
+                    <th>Status</th>
+                    <th>Order Date</th>
+                    <th>Delete</th>
+                    <th>Edit</th>
+                </tr>
+                <?php while ($order = mysqli_fetch_assoc($result)) : ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($order['id']); ?></td>
+                        <td><?php echo htmlspecialchars($order['item_name']); ?></td>
+                        <td>$<?php echo htmlspecialchars($order['item_price']); ?></td>
+                        <td><?php echo htmlspecialchars($order['quantity']); ?></td>
+                        <td>$<?php echo htmlspecialchars($order['quantity'] * $order['item_price']); ?></td>
+                        <td><?php echo htmlspecialchars($order['room_number']); ?></td>
+                        <td><?php echo htmlspecialchars($order['status']); ?></td>
+                        <td><?php echo htmlspecialchars($order['order_date']); ?></td>
+                        <td><a href="delete_order.php?orderid=<?php echo $order['id']; ?>" class="btn btn-danger">Delete</a></td>
+                        <td><a href="edit_order.php?orderid=<?php echo $order['id']; ?>" class="btn btn-warning">Edit</a></td>
+                    </tr>
+                <?php endwhile; ?>
+            </table>
+        </div>
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
     </section>
 
 >>>>>>> b0afb19 (home,logout,cart,order)
@@ -607,13 +634,18 @@ mysqli_stmt_close($stmt);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 =======
     <!-- Bootstrap JS -->
+<<<<<<< HEAD
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
 </body>
 </html>
 
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 
@@ -623,3 +655,8 @@ mysqli_stmt_close($stmt);
 
 =======
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+
+
+
+>>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
