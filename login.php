@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($errors)) {
         // Check if user exists
 <<<<<<< HEAD
+<<<<<<< HEAD
         $query = "SELECT * FROM users WHERE email = ?";
         $stmt = mysqli_prepare($myConnection, $query);
         mysqli_stmt_bind_param($stmt, "s", $email);
@@ -33,6 +34,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $query = "SELECT * FROM users WHERE email = '$email'";
         $result = mysqli_query($connection, $query);
 >>>>>>> 63d3ef8 (my work for cafeteria project)
+=======
+        $query = "SELECT * FROM users WHERE email = ?";
+        $stmt = mysqli_prepare($connection, $query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+>>>>>>> b0afb19 (home,logout,cart,order)
 
         if (mysqli_num_rows($result) === 1) {
             $user = mysqli_fetch_assoc($result);
@@ -41,9 +49,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (password_verify($password, $user['password'])) {
                 // Password is correct, set session variables
 <<<<<<< HEAD
+<<<<<<< HEAD
                 $_SESSION["user_id"] = $user["id"]; // إضافة user_id
 =======
 >>>>>>> 63d3ef8 (my work for cafeteria project)
+=======
+                $_SESSION["user_id"] = $user["id"]; // إضافة user_id
+>>>>>>> b0afb19 (home,logout,cart,order)
                 $_SESSION["username"] = $user["username"];
                 $_SESSION["email"] = $user["email"];
                 $_SESSION["role"] = $user["role"];
@@ -62,6 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $errors[] = "Incorrect email or password.";
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         mysqli_stmt_close($stmt);
     }
 }
@@ -70,6 +83,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 >>>>>>> 63d3ef8 (my work for cafeteria project)
+=======
+        mysqli_stmt_close($stmt);
+    }
+}
+>>>>>>> b0afb19 (home,logout,cart,order)
 ?>
 
 <!DOCTYPE html>
@@ -88,9 +106,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h3 class="mb-3 text-center">Login</h3>
     
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> 63d3ef8 (my work for cafeteria project)
+=======
+>>>>>>> b0afb19 (home,logout,cart,order)
     <?php if (!empty($errors)): ?>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -118,9 +139,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php endif; ?>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> 63d3ef8 (my work for cafeteria project)
+=======
+>>>>>>> b0afb19 (home,logout,cart,order)
     <form method="POST">
       <div class="mb-3">
         <label for="email" class="form-label">Email address</label>
@@ -133,10 +157,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
       <button type="submit" class="btn w-100" style="background-color: #6f4e37; color: white;">Login</button>
 =======
       <button type="submit" class="btn w-100" style="background-color: #6f4e37; color: white;">login</button>
 >>>>>>> 63d3ef8 (my work for cafeteria project)
+=======
+      <button type="submit" class="btn w-100" style="background-color: #6f4e37; color: white;">Login</button>
+>>>>>>> b0afb19 (home,logout,cart,order)
       <div class="text-center mt-3">
         <a href="register.php">Don't have an account? Register</a>
       </div>
@@ -147,7 +175,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </html>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 =======
 >>>>>>> 63d3ef8 (my work for cafeteria project)
+=======
+
+
+>>>>>>> b0afb19 (home,logout,cart,order)

@@ -1,12 +1,24 @@
 <?php
 session_start();
+<<<<<<< HEAD
 include_once './config/dbConnection.php';
 
+=======
+include_once 'db.php';
+
+// إنشاء جلسة للسلة لو مش موجودة
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+// التأكد من إن المستخدم مسجل دخول
+>>>>>>> b0afb19 (home,logout,cart,order)
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
+<<<<<<< HEAD
 $user_id = $_SESSION['user_id'];
 
 if (!isset($_SESSION['cart'])) {
@@ -23,6 +35,9 @@ $latest_order_query = "SELECT orders.*, SUM(items.price * orders.quantity) as to
 $latest_order_result = mysqli_query($myConnection, $latest_order_query);
 $latest_order = mysqli_fetch_assoc($latest_order_result);
 
+=======
+// تعديل الكمية في السلة
+>>>>>>> b0afb19 (home,logout,cart,order)
 if (isset($_POST['update_quantity'])) {
     $item_id = $_POST['item_id'];
     $action = $_POST['action'];
@@ -38,6 +53,10 @@ if (isset($_POST['update_quantity'])) {
     exit();
 }
 
+<<<<<<< HEAD
+=======
+// إزالة منتج من السلة
+>>>>>>> b0afb19 (home,logout,cart,order)
 if (isset($_POST['remove_from_cart'])) {
     $item_id = $_POST['remove_from_cart'];
     unset($_SESSION['cart'][$item_id]);
@@ -45,6 +64,7 @@ if (isset($_POST['remove_from_cart'])) {
     exit();
 }
 
+<<<<<<< HEAD
 // Confirm order processing
 if (isset($_POST['confirm_order'])) {
     $room_number = $_POST['room'];
@@ -81,14 +101,51 @@ if (isset($_POST['confirm_order'])) {
 }
 $cart_count = array_sum($_SESSION['cart']);
 ?>
+=======
+// تسجيل الطلب لما نضغط "Confirm" في الـ Modal
+if (isset($_POST['confirm_order'])) {
+    $room_number = $_POST['room'];
+    $cart_items = $_SESSION['cart'];
+    $user_id = $_SESSION['user_id'];
+
+    // إضافة سجل لكل منتج في جدول orders
+    foreach ($cart_items as $item_id => $quantity) {
+        $query = "INSERT INTO orders (user_id, item_id, quantity, status, room_number) VALUES (?, ?, ?, 'confirmed', ?)";
+        $stmt = mysqli_prepare($connection, $query);
+        mysqli_stmt_bind_param($stmt, "iiis", $user_id, $item_id, $quantity, $room_number);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+
+    // تفريغ السلة
+    $_SESSION['cart'] = [];
+
+    // إعادة توجيه المستخدم لصفحة My Orders
+    header("Location: my_orders.php");
+    exit();
+}
+
+// حساب عدد العناصر في السلة
+$cart_count = array_sum($_SESSION['cart']);
+?>
+
+>>>>>>> b0afb19 (home,logout,cart,order)
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feane Cafeteria - Cart</title>
+<<<<<<< HEAD
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+=======
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+>>>>>>> b0afb19 (home,logout,cart,order)
     <style>
         body {
             background-color: #F5F5DC;
@@ -107,6 +164,7 @@ $cart_count = array_sum($_SESSION['cart']);
             width: 100%;
             z-index: 3;
         }
+<<<<<<< HEAD
         .navbar .navbar-brand {
             color: #d2b48c; /* درجة بني فاتحة عشان كلمة Feane تبقى واضحة */
         }
@@ -116,6 +174,14 @@ $cart_count = array_sum($_SESSION['cart']);
         }
         .navbar .nav-link:hover {
             color: #6d3e1a;
+=======
+        .navbar .nav-link {
+            color: white;
+            margin: 0 15px;
+        }
+        .navbar .nav-link:hover {
+            color: #8d5524;
+>>>>>>> b0afb19 (home,logout,cart,order)
         }
         .navbar .btn-order-online {
             background-color: #8d5524;
@@ -127,16 +193,23 @@ $cart_count = array_sum($_SESSION['cart']);
         .navbar .btn-order-online:hover {
             background-color: #6d3e1a;
         }
+<<<<<<< HEAD
         .navbar .welcome-text {
             color: #8d5524; /* نفس لون الروابط */
         }
+=======
+>>>>>>> b0afb19 (home,logout,cart,order)
         .cart-icon {
             position: relative;
             margin-left: 10px;
         }
         .cart-icon i {
             font-size: 1.5rem;
+<<<<<<< HEAD
             color: #d2b48c; /* درجة بني فاتحة عشان الأيقونة تبان */
+=======
+            color: white;
+>>>>>>> b0afb19 (home,logout,cart,order)
         }
         .cart-icon .cart-count {
             position: absolute;
@@ -149,6 +222,7 @@ $cart_count = array_sum($_SESSION['cart']);
             font-size: 0.8rem;
         }
 
+<<<<<<< HEAD
         /* Latest Order Section */
         .latest-order {
             background-color: #5C4033;
@@ -170,13 +244,19 @@ $cart_count = array_sum($_SESSION['cart']);
             color: #d2b48c;
         }
 
+=======
+>>>>>>> b0afb19 (home,logout,cart,order)
         /* Cart Section */
         .cart-section {
             background-color: #5C4033;
             color: white;
             padding: 30px;
             border-radius: 15px;
+<<<<<<< HEAD
             margin: 20px auto 30px auto;
+=======
+            margin: 100px auto 30px auto;
+>>>>>>> b0afb19 (home,logout,cart,order)
             max-width: 600px;
         }
         .cart-section h3 {
@@ -230,6 +310,7 @@ $cart_count = array_sum($_SESSION['cart']);
             align-items: center;
             justify-content: center;
         }
+<<<<<<< HEAD
         /* شيلنا تأثير الـ Hover */
         .cart-section .btn-danger {
             background-color: #8d5524;
@@ -238,6 +319,11 @@ $cart_count = array_sum($_SESSION['cart']);
             padding: 5px 10px;
         }
         /* شيلنا تأثير الـ Hover */
+=======
+        .quantity-controls button:hover {
+            background-color: #6d3e1a;
+        }
+>>>>>>> b0afb19 (home,logout,cart,order)
         .cart-section .total-price {
             font-size: 1.2rem;
             font-weight: bold;
@@ -334,7 +420,11 @@ $cart_count = array_sum($_SESSION['cart']);
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
+<<<<<<< HEAD
             <a class="navbar-brand" href="#">Feane</a>
+=======
+            <a class="navbar-brand text-white" href="#">Feane</a>
+>>>>>>> b0afb19 (home,logout,cart,order)
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -347,12 +437,31 @@ $cart_count = array_sum($_SESSION['cart']);
                         <a class="nav-link" href="#">MENU</a>
                     </li>
                     <li class="nav-item">
+<<<<<<< HEAD
                         <a class="nav-link active" href="my_orders.php">MY ORDERS</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
                     <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
+=======
+                        <a class="nav-link" href="#">ABOUT</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">BOOK TABLE</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="my_orders.php">MY ORDERS</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <span class="text-white me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+                        <a href="logout.php" class="btn btn-order-online">Logout</a>
+                    <?php else: ?>
+                        <a href="login.php" class="btn btn-order-online">Login</a>
+                    <?php endif; ?>
+>>>>>>> b0afb19 (home,logout,cart,order)
                     <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
                         <i class="bi bi-cart"></i>
                         <span class="cart-count"><?php echo $cart_count; ?></span>
@@ -362,6 +471,7 @@ $cart_count = array_sum($_SESSION['cart']);
         </div>
     </nav>
 
+<<<<<<< HEAD
     <!-- Latest Order Section -->
     <?php if ($latest_order): ?>
         <section class="latest-order">
@@ -434,6 +544,73 @@ $cart_count = array_sum($_SESSION['cart']);
         <button type="button" class="btn btn-order" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">Order Now</button>
     <?php endif; ?>
 </section>
+=======
+    <!-- Cart Section -->
+    <section class="cart-section">
+        <h3>Your Cart</h3>
+        <?php
+        $total_price = 0;
+        if (!empty($_SESSION['cart'])) {
+            foreach ($_SESSION['cart'] as $item_id => $quantity) {
+                $item_query = "SELECT * FROM items WHERE id = ?";
+                $stmt = mysqli_prepare($connection, $item_query);
+                mysqli_stmt_bind_param($stmt, "i", $item_id);
+                mysqli_stmt_execute($stmt);
+                $item_result = mysqli_stmt_get_result($stmt);
+                $item = mysqli_fetch_assoc($item_result);
+                mysqli_stmt_close($stmt);
+
+                $subtotal = $item['price'] * $quantity;
+                $total_price += $subtotal;
+        ?>
+            <div class="cart-item">
+                <?php
+                $image_path = $_SERVER['DOCUMENT_ROOT'] . '/cafateriapro/uploads/' . $item['image_url'];
+                if (file_exists($image_path)):
+                ?>
+                    <img src="/cafateriapro/uploads/<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
+                <?php else: ?>
+                    <img src="https://via.placeholder.com/50" alt="Placeholder">
+                <?php endif; ?>
+                <div class="cart-item-details">
+                    <h6><?php echo htmlspecialchars($item['name']); ?></h6>
+                    <div class="subtotal">$<?php echo $subtotal; ?></div>
+                </div>
+                <div class="quantity-controls">
+                    <form method="post" style="display: inline;">
+                        <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
+                        <input type="hidden" name="action" value="decrease">
+                        <button type="submit" name="update_quantity">-</button>
+                    </form>
+                    <span class="cart-quantity"><?php echo $quantity; ?></span>
+                    <form method="post" style="display: inline;">
+                        <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
+                        <input type="hidden" name="action" value="increase">
+                        <button type="submit" name="update_quantity">+</button>
+                    </form>
+                </div>
+                <form method="post" style="display: inline; margin-left: 10px;">
+                    <button type="submit" name="remove_from_cart" value="<?php echo $item_id; ?>" class="btn btn-sm btn-danger">X</button>
+                </form>
+            </div>
+        <?php
+            }
+        } else {
+            echo "<p>Your cart is empty</p>";
+        }
+        ?>
+        <div class="total-price">
+            Total: $<span id="total-price"><?php echo number_format($total_price, 2); ?></span>
+        </div>
+
+        <!-- Order Now Button to Open Modal -->
+        <?php if (!empty($_SESSION['cart'])): ?>
+            <button type="button" class="btn btn-order" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">Order Now</button>
+        <?php endif; ?>
+    </section>
+
+    <!-- Confirm Order Modal -->
+>>>>>>> b0afb19 (home,logout,cart,order)
     <div class="modal fade" id="confirmOrderModal" tabindex="-1" aria-labelledby="confirmOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -447,9 +624,19 @@ $cart_count = array_sum($_SESSION['cart']);
                         $modal_total_price = 0;
                         if (!empty($_SESSION['cart'])) {
                             foreach ($_SESSION['cart'] as $item_id => $quantity) {
+<<<<<<< HEAD
                                 $item_query = "SELECT * FROM items WHERE id = $item_id";
                                 $item_result = mysqli_query($myConnection, $item_query);
                                 $item = mysqli_fetch_assoc($item_result);
+=======
+                                $item_query = "SELECT * FROM items WHERE id = ?";
+                                $stmt = mysqli_prepare($connection, $item_query);
+                                mysqli_stmt_bind_param($stmt, "i", $item_id);
+                                mysqli_stmt_execute($stmt);
+                                $item_result = mysqli_stmt_get_result($stmt);
+                                $item = mysqli_fetch_assoc($item_result);
+                                mysqli_stmt_close($stmt);
+>>>>>>> b0afb19 (home,logout,cart,order)
 
                                 $subtotal = $item['price'] * $quantity;
                                 $modal_total_price += $subtotal;
@@ -457,14 +644,22 @@ $cart_count = array_sum($_SESSION['cart']);
                             <div class="cart-item">
                                 <span><?php echo htmlspecialchars($item['name']); ?></span>
                                 <span class="cart-quantity"><?php echo $quantity; ?></span>
+<<<<<<< HEAD
                                 <span><?php echo $subtotal; ?> EGP</span>
+=======
+                                <span>$<?php echo $subtotal; ?></span>
+>>>>>>> b0afb19 (home,logout,cart,order)
                             </div>
                         <?php
                             }
                         }
                         ?>
                         <div class="total-price">
+<<<<<<< HEAD
                             Total: <span><?php echo number_format($modal_total_price, 2); ?> EGP</span>
+=======
+                            Total: $<span><?php echo number_format($modal_total_price, 2); ?></span>
+>>>>>>> b0afb19 (home,logout,cart,order)
                         </div>
 
                         <!-- Room Number Dropdown -->
@@ -489,6 +684,10 @@ $cart_count = array_sum($_SESSION['cart']);
         </div>
     </div>
 
+<<<<<<< HEAD
+=======
+    <!-- Footer -->
+>>>>>>> b0afb19 (home,logout,cart,order)
     <footer>
         <div class="container">
             <p>© 2025 Feane Cafeteria. All Rights Reserved.</p>
@@ -502,9 +701,12 @@ $cart_count = array_sum($_SESSION['cart']);
 </html>
 
 
+<<<<<<< HEAD
 
 
 
 
 
 
+=======
+>>>>>>> b0afb19 (home,logout,cart,order)

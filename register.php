@@ -55,9 +55,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
     $confirm = $_POST["confirm"];
-    $room_number = $_POST["room_number"];
 
-    if (empty($username) || empty($email) || empty($password) || empty($room_number)) {
+    if (empty($username) || empty($email) || empty($password) || empty($confirm)) {
         $errors[] = "All fields are required.";
     }
 
@@ -81,30 +80,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $allowed = ["png", "jpg", "jpeg", "gif"];
 
         if (in_array($ext, $allowed)) {
-            $newFileName = "images/" . time() . "_" . $fileName;
+            $newFileName = "uploads/" . time() . "_" . $fileName;
             move_uploaded_file($fileTmp, $newFileName);
             $profile_picture = $newFileName;
         } else {
             $errors[] = "Invalid image format. Allowed: png, jpg, jpeg, gif";
         }
     } else {
-        $profile_picture = "images/default.png";
+        $profile_picture = "uploads/default.png";
     }
 
     if (empty($errors)) {
+<<<<<<< HEAD
         $check_query = "SELECT id FROM users WHERE email = '$email'";
         $result = mysqli_query($connection, $check_query);
 >>>>>>> 63d3ef8 (my work for cafeteria project)
+=======
+        $check_query = "SELECT id FROM users WHERE email = ?";
+        $stmt = mysqli_prepare($connection, $check_query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+>>>>>>> b0afb19 (home,logout,cart,order)
 
         if (mysqli_num_rows($result) > 0) {
             $errors[] = "Email already registered.";
         } else {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $query = "INSERT INTO users (username, email, password, room_number, profile_picture) 
-                      VALUES ('$username', '$email', '$hashedPassword', '$room_number', '$profile_picture')";
-            $insert_result = mysqli_query($connection, $query);
-
-            if ($insert_result) {
+            $query = "INSERT INTO users (username, email, password, profile_picture) 
+                      VALUES (?, ?, ?, ?)";
+            $stmt = mysqli_prepare($connection, $query);
+            mysqli_stmt_bind_param($stmt, "ssss", $username, $email, $hashedPassword, $profile_picture);
+            if (mysqli_stmt_execute($stmt)) {
                 $_SESSION["username"] = $username;
                 $_SESSION["email"] = $email;
                 header("Location: login.php");
@@ -113,6 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $errors[] = "Error inserting user: " . mysqli_error($connection);
             }
         }
+        mysqli_stmt_close($stmt);
     }
 }
 ?>
@@ -176,18 +184,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
 
       <div class="mb-3">
-        <label for="room_number" class="form-label">Room Number</label>
-        <select name="room_number" id="room_number" class="form-control" required>
-          <option value="">Select Room</option>
-          <option value="101">101</option>
-          <option value="102">102</option>
-          <option value="103">103</option>
-          <option value="104">104</option>
-          <option value="105">105</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
         <label for="profile_picture" class="form-label">Profile Picture</label>
         <input type="file" name="profile_picture" id="profile_picture" class="form-control" accept="image/*">
       </div>
@@ -201,5 +197,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 </body>
 </html>
+
+
 
 
