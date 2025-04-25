@@ -175,6 +175,7 @@ $cart_count = array_sum($_SESSION['cart']);
             z-index: 3;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         .navbar .navbar-brand {
             color: #d2b48c; /* درجة بني فاتحة عشان كلمة Feane تبقى واضحة */
         }
@@ -185,13 +186,22 @@ $cart_count = array_sum($_SESSION['cart']);
         .navbar .nav-link:hover {
             color: #6d3e1a;
 =======
+=======
+        .navbar .navbar-brand {
+            color: #d2b48c; /* درجة بني فاتحة عشان كلمة Feane تبقى واضحة */
+        }
+>>>>>>> e16d65e (updatenavbar)
         .navbar .nav-link {
-            color: white;
+            color: #8d5524; /* درجة بني غامق وواضح */
             margin: 0 15px;
         }
         .navbar .nav-link:hover {
+<<<<<<< HEAD
             color: #8d5524;
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+            color: #6d3e1a;
+>>>>>>> e16d65e (updatenavbar)
         }
         .navbar .btn-order-online {
             background-color: #8d5524;
@@ -204,11 +214,17 @@ $cart_count = array_sum($_SESSION['cart']);
             background-color: #6d3e1a;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         .navbar .welcome-text {
             color: #8d5524; /* نفس لون الروابط */
         }
 =======
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+        .navbar .welcome-text {
+            color: #8d5524; /* نفس لون الروابط */
+        }
+>>>>>>> e16d65e (updatenavbar)
         .cart-icon {
             position: relative;
             margin-left: 10px;
@@ -216,10 +232,14 @@ $cart_count = array_sum($_SESSION['cart']);
         .cart-icon i {
             font-size: 1.5rem;
 <<<<<<< HEAD
+<<<<<<< HEAD
             color: #d2b48c; /* درجة بني فاتحة عشان الأيقونة تبان */
 =======
             color: white;
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+            color: #d2b48c; /* درجة بني فاتحة عشان الأيقونة تبان */
+>>>>>>> e16d65e (updatenavbar)
         }
         .cart-icon .cart-count {
             position: absolute;
@@ -331,12 +351,16 @@ $cart_count = array_sum($_SESSION['cart']);
             justify-content: center;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e16d65e (updatenavbar)
         /* شيلنا تأثير الـ Hover */
         .cart-section .btn-danger {
             background-color: #8d5524;
             border: none;
             border-radius: 25px;
             padding: 5px 10px;
+<<<<<<< HEAD
         }
         /* شيلنا تأثير الـ Hover */
 =======
@@ -344,6 +368,10 @@ $cart_count = array_sum($_SESSION['cart']);
             background-color: #6d3e1a;
         }
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+        }
+        /* شيلنا تأثير الـ Hover */
+>>>>>>> e16d65e (updatenavbar)
         .cart-section .total-price {
             font-size: 1.2rem;
             font-weight: bold;
@@ -441,10 +469,14 @@ $cart_count = array_sum($_SESSION['cart']);
     <nav class="navbar navbar-expand-lg">
         <div class="container">
 <<<<<<< HEAD
+<<<<<<< HEAD
             <a class="navbar-brand" href="#">Feane</a>
 =======
             <a class="navbar-brand text-white" href="#">Feane</a>
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+            <a class="navbar-brand" href="#">Feane</a>
+>>>>>>> e16d65e (updatenavbar)
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -476,6 +508,7 @@ $cart_count = array_sum($_SESSION['cart']);
                 </ul>
                 <div class="d-flex align-items-center">
 <<<<<<< HEAD
+<<<<<<< HEAD
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <span class="text-white me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
                         <a href="logout.php" class="btn btn-order-online">Logout</a>
@@ -485,6 +518,9 @@ $cart_count = array_sum($_SESSION['cart']);
 >>>>>>> b0afb19 (home,logout,cart,order)
 =======
                     <span class="text-white me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+=======
+                    <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+>>>>>>> e16d65e (updatenavbar)
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
                     <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
@@ -743,14 +779,18 @@ $cart_count = array_sum($_SESSION['cart']);
 
 <<<<<<< HEAD
 <<<<<<< HEAD
-
 <<<<<<< HEAD
 
+<<<<<<< HEAD
+=======
+>>>>>>> e16d65e (updatenavbar)
 
 
 
 
 
+
+<<<<<<< HEAD
 =======
 >>>>>>> b0afb19 (home,logout,cart,order)
 =======
@@ -760,3 +800,6 @@ mysqli_close($connection);
 >>>>>>> f5d4e80 (editorder,deletorder,upateorder&homepages)
 =======
 >>>>>>> 16a93a9 (updatemyorder&cart)
+=======
+
+>>>>>>> e16d65e (updatenavbar)
