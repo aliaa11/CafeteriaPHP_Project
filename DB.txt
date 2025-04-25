@@ -9,7 +9,6 @@ CREATE TABLE users (
 
 );
 
-
 -- جدول الكاتيجوريز
 CREATE TABLE categories (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -34,7 +33,7 @@ CREATE TABLE orders (
   user_id INT,
   item_id INT,
   quantity INT,
-  status ENUM('confirmed', 'processing', 'canceled', 'delivered') DEFAULT 'pending',
+  status ENUM('pending', 'confirmed', 'canceled', 'delivered') DEFAULT 'pending',
   order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
   room_number VARCHAR(10),
   FOREIGN KEY (user_id) REFERENCES users(id),
@@ -90,7 +89,7 @@ CREATE TABLE orders (
 -- SELECT * FROM orders WHERE user_id = ?;
 
 -- عرض الأوردر الحالي لليوزر (pending)
--- SELECT * FROM orders WHERE user_id = ? AND status = 'processing';
+-- SELECT * FROM orders WHERE user_id = ? AND status = 'pending';
 
 -- إضافة أوردر جديد
 -- INSERT INTO orders (user_id, item_id, quantity) VALUES (?, ?, ?);
@@ -102,4 +101,4 @@ CREATE TABLE orders (
 -- DELETE FROM orders WHERE id = ? AND user_id = ?;
 
 -- الأدمن يكنسل أوردر طالما مش delivered
--- UPDATE orders SET status = 'canceled' WHERE id = ? AND status != 'delivered' AND status != 'confirmed';
+-- UPDATE orders SET status = 'canceled' WHERE id = ? AND status != 'delivered';
