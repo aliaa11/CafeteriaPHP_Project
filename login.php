@@ -19,8 +19,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($errors)) {
         // Check if user exists
-        $query = "SELECT * FROM users WHERE email = '$email'";
-        $result = mysqli_query($connection, $query);
+        $query = "SELECT * FROM users WHERE email = ?";
+        $stmt = mysqli_prepare($connection, $query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
         if (mysqli_num_rows($result) === 1) {
             $user = mysqli_fetch_assoc($result);
@@ -28,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Verify the password using password_verify
             if (password_verify($password, $user['password'])) {
                 // Password is correct, set session variables
+                $_SESSION["user_id"] = $user["id"]; // إضافة user_id
                 $_SESSION["username"] = $user["username"];
                 $_SESSION["email"] = $user["email"];
                 $_SESSION["role"] = $user["role"];
@@ -45,9 +49,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $errors[] = "Incorrect email or password.";
         }
+        mysqli_stmt_close($stmt);
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -65,7 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
      style="width: 600px; background-color: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px);">
     <h3 class="mb-3 text-center">Login</h3>
     
-
     <?php if (!empty($errors)): ?>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -92,7 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </script>
 <?php endif; ?>
 
-
     <form method="POST">
       <div class="mb-3">
         <label for="email" class="form-label">Email address</label>
@@ -104,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="password" name="password" id="password" class="form-control" required>
       </div>
 
-      <button type="submit" class="btn w-100" style="background-color: #6f4e37; color: white;">login</button>
+      <button type="submit" class="btn w-100" style="background-color: #6f4e37; color: white;">Login</button>
       <div class="text-center mt-3">
         <a href="register.php">Don't have an account? Register</a>
       </div>
@@ -113,4 +115,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 </body>
 </html>
+
+
 
