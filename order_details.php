@@ -1,0 +1,235 @@
+<?php
+session_start();
+include_once './config/dbConnection.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+$cart_count = array_sum($_SESSION['cart']);
+
+if (!isset($_GET['order_id']) || !is_numeric($_GET['order_id'])) {
+    header("Location: my_orders.php");
+    exit();
+}
+
+$order_id = $_GET['order_id'];
+$user_id = $_SESSION['user_id'];
+
+$order_query = "SELECT o.*, u.username, 
+               (SELECT SUM(i.price * oi.quantity) 
+                FROM order_items oi 
+                JOIN items i ON oi.item_id = i.id 
+                WHERE oi.order_id = o.id) as total_price
+                FROM orders o
+                JOIN users u ON o.user_id = u.id
+                WHERE o.id = ? AND o.user_id = ?";
+$stmt = mysqli_prepare($myConnection, $order_query);
+mysqli_stmt_bind_param($stmt, "ii", $order_id, $user_id);
+mysqli_stmt_execute($stmt);
+$order_result = mysqli_stmt_get_result($stmt);
+$order = mysqli_fetch_assoc($order_result);
+
+if (!$order) {
+    header("Location: my_orders.php");
+    exit();
+}
+
+$items_query = "SELECT i.*, oi.quantity 
+               FROM order_items oi
+               JOIN items i ON oi.item_id = i.id
+               WHERE oi.order_id = ?";
+$stmt = mysqli_prepare($myConnection, $items_query);
+mysqli_stmt_bind_param($stmt, "i", $order_id);
+mysqli_stmt_execute($stmt);
+$items_result = mysqli_stmt_get_result($stmt);
+$items = mysqli_fetch_all($items_result, MYSQLI_ASSOC); 
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Feane Cafeteria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+               .navbar {
+            background-color: transparent;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 3;
+        }
+        .navbar .navbar-brand {
+            color: #d2b48c; 
+        }
+        .navbar .nav-link {
+            color: #8d5524;
+            margin: 0 15px;
+        }
+        .navbar .nav-link:hover {
+            color: #6d3e1a;
+        }
+        .navbar .btn-order-online {
+            background-color: #8d5524;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+        }
+        .navbar .btn-order-online:hover {
+            background-color: #6d3e1a;
+        }
+        .navbar .welcome-text {
+            color: #8d5524; 
+        }
+        .cart-icon {
+            position: relative;
+            margin-left: 10px;
+        }
+        .cart-icon i {
+            font-size: 1.5rem;
+            color: #d2b48c; 
+        }
+        .cart-icon .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #8d5524;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+        }
+
+        body {
+            background-color: #F5F5DC;
+        }
+        .order-details {
+            background-color: #5C4033;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 80px auto 30px auto;
+            max-width: 800px;
+        }
+        .order-header {
+            border-bottom: 2px solid #8d5524;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .order-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status-pending {
+            background-color: #FFC107;
+            color: #000;
+        }
+        .status-confirmed {
+            background-color: #28A745;
+            color: #FFF;
+        }
+        .status-cancelled {
+            background-color: #DC3545;
+            color: #FFF;
+        }
+        .status-completed {
+            background-color: #17A2B8;
+            color: #FFF;
+        }
+    </style>
+</head>
+<body>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Feane</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="home.php">HOME</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">MENU</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="my_orders.php">MY ORDERS</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+                    <a href="logout.php" class="btn btn-order-online">Logout</a>
+                    <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
+                        <i class="bi bi-cart"></i>
+                        <span class="cart-count"><?php echo $cart_count; ?></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+<div class="container">
+        <div class="order-details">
+            <div class="order-header">
+                <h2>Order #<?php echo $order['id']; ?></h2>
+                <p><strong>Customer:</strong> <?php echo htmlspecialchars($order['username']); ?></p>
+                <p><strong>Date:</strong> <?php echo $order['order_date']; ?></p>
+                <p><strong>Room:</strong> <?php echo htmlspecialchars($order['room_number']); ?></p>
+                <p><strong>Status:</strong> 
+                    <span class="order-status status-<?php echo strtolower($order['status']); ?>">
+                        <?php echo ucfirst($order['status']); ?>
+                    </span>
+                </p>
+            </div>
+
+            <h4>Order Items</h4>
+            <?php if (!empty($items)): ?>
+                <?php foreach ($items as $item): ?>
+                    <div class="order-item">
+                        <div>
+                            <h5><?= htmlspecialchars($item['name']) ?></h5>
+                            <p><?= htmlspecialchars($item['description']) ?></p>
+                        </div>
+                        <div>
+                            <p>Quantity: <?= $item['quantity'] ?></p>
+                            <p>Price: <?= number_format($item['price'] * $item['quantity'], 2) ?> EGP</p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>No items found in this order.</p>
+            <?php endif; ?>
+
+            <div class="order-total mt-4">
+                <h4>Total: <?= number_format($order['total_price'] ?? 0, 2) ?> EGP</h4>
+            </div>
+            <div class="mt-4">
+                <a href="my_orders.php" class="btn btn-primary">Back to My Orders</a>
+                <?php if ($order['status'] == 'pending'): ?>
+                    <a href="cancel_order.php?order_id=<?php echo $order_id; ?>" class="btn btn-danger">Cancel Order</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

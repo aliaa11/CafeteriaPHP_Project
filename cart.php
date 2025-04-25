@@ -1,8 +1,7 @@
 <?php
 session_start();
-include_once 'db.php';
+include_once './config/dbConnection.php';
 
-// التأكد من إن المستخدم مسجل دخول
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -10,12 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// إنشاء جلسة للسلة لو مش موجودة
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-// جلب أحدث أوردار للمستخدم
 $latest_order_query = "SELECT orders.*, SUM(items.price * orders.quantity) as total_price 
                        FROM orders 
                        JOIN items ON orders.item_id = items.id 
@@ -23,10 +20,9 @@ $latest_order_query = "SELECT orders.*, SUM(items.price * orders.quantity) as to
                        GROUP BY orders.id 
                        ORDER BY orders.order_date DESC 
                        LIMIT 1";
-$latest_order_result = mysqli_query($connection, $latest_order_query);
+$latest_order_result = mysqli_query($myConnection, $latest_order_query);
 $latest_order = mysqli_fetch_assoc($latest_order_result);
 
-// تعديل الكمية في السلة
 if (isset($_POST['update_quantity'])) {
     $item_id = $_POST['item_id'];
     $action = $_POST['action'];
@@ -42,7 +38,6 @@ if (isset($_POST['update_quantity'])) {
     exit();
 }
 
-// إزالة منتج من السلة
 if (isset($_POST['remove_from_cart'])) {
     $item_id = $_POST['remove_from_cart'];
     unset($_SESSION['cart'][$item_id]);
@@ -50,29 +45,42 @@ if (isset($_POST['remove_from_cart'])) {
     exit();
 }
 
-// تسجيل الطلب لما نضغط "Confirm" في الـ Modal
+// Confirm order processing
 if (isset($_POST['confirm_order'])) {
     $room_number = $_POST['room'];
     $cart_items = $_SESSION['cart'];
-
-    // إضافة سجل لكل منتج في جدول orders
-    foreach ($cart_items as $item_id => $quantity) {
-        $query = "INSERT INTO orders (user_id, item_id, quantity, status, room_number) VALUES ($user_id, $item_id, $quantity, 'confirmed', '$room_number')";
-        mysqli_query($connection, $query);
-    }
-
-    // تفريغ السلة
-    $_SESSION['cart'] = [];
-
-    // إعادة توجيه المستخدم لصفحة My Orders
-    header("Location: my_orders.php");
-    exit();
+    
+    mysqli_begin_transaction($myConnection);
+    
+        $order_query = "INSERT INTO orders (user_id, status, room_number) 
+                       VALUES (?, 'pending', ?)";
+        $stmt = mysqli_prepare($myConnection, $order_query);
+        mysqli_stmt_bind_param($stmt, "is", $_SESSION['user_id'], $room_number);
+        mysqli_stmt_execute($stmt);
+        $order_id = mysqli_insert_id($myConnection);
+        
+        // 2. Add all items to order_items
+        foreach ($cart_items as $item_id => $quantity) {
+            $item_query = "INSERT INTO order_items (order_id, item_id, quantity)
+                          VALUES (?, ?, ?)";
+            $stmt = mysqli_prepare($myConnection, $item_query);
+            mysqli_stmt_bind_param($stmt, "iii", $order_id, $item_id, $quantity);
+            mysqli_stmt_execute($stmt);
+            
+            if (mysqli_affected_rows($myConnection) === 0) {
+                throw new Exception("Failed to insert item $item_id");
+            }
+        }
+        
+        mysqli_commit($myConnection);
+        $_SESSION['cart'] = [];
+        header("Location: order_details.php?order_id=$order_id");
+        exit();
+        
+    
 }
-
-// حساب عدد العناصر في السلة
 $cart_count = array_sum($_SESSION['cart']);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -342,13 +350,7 @@ $cart_count = array_sum($_SESSION['cart']);
                         <a class="nav-link" href="#">MENU</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">ABOUT</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">BOOK TABLE</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="my_orders.php">MY ORDERS</a>
+                        <a class="nav-link active" href="my_orders.php">MY ORDERS</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
@@ -381,7 +383,7 @@ $cart_count = array_sum($_SESSION['cart']);
         if (!empty($_SESSION['cart'])) {
             foreach ($_SESSION['cart'] as $item_id => $quantity) {
                 $item_query = "SELECT * FROM items WHERE id = $item_id";
-                $item_result = mysqli_query($connection, $item_query);
+                $item_result = mysqli_query($myConnection, $item_query);
                 $item = mysqli_fetch_assoc($item_result);
 
                 $subtotal = $item['price'] * $quantity;
@@ -427,13 +429,11 @@ $cart_count = array_sum($_SESSION['cart']);
             Total: <span id="total-price"><?php echo number_format($total_price, 2); ?> EGP</span>
         </div>
 
-        <!-- Order Now Button to Open Modal -->
         <?php if (!empty($_SESSION['cart'])): ?>
             <button type="button" class="btn btn-order" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">Order Now</button>
         <?php endif; ?>
     </section>
 
-    <!-- Confirm Order Modal -->
     <div class="modal fade" id="confirmOrderModal" tabindex="-1" aria-labelledby="confirmOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -448,7 +448,7 @@ $cart_count = array_sum($_SESSION['cart']);
                         if (!empty($_SESSION['cart'])) {
                             foreach ($_SESSION['cart'] as $item_id => $quantity) {
                                 $item_query = "SELECT * FROM items WHERE id = $item_id";
-                                $item_result = mysqli_query($connection, $item_query);
+                                $item_result = mysqli_query($myConnection, $item_query);
                                 $item = mysqli_fetch_assoc($item_result);
 
                                 $subtotal = $item['price'] * $quantity;
@@ -489,7 +489,6 @@ $cart_count = array_sum($_SESSION['cart']);
         </div>
     </div>
 
-    <!-- Footer -->
     <footer>
         <div class="container">
             <p>© 2025 Feane Cafeteria. All Rights Reserved.</p>
