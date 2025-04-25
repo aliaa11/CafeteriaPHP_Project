@@ -207,6 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
         <?php endif; ?>
         
         <form method="POST" enctype="multipart/form-data">
+<<<<<<< HEAD
             <div class="form-card animate__animated animate__fadeInUp">
                 <div class="row">
                     <div class="col-md-6">
@@ -232,6 +233,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
                             <input type="file" class="form-control" name="image" accept="image/*">
                             <div class="form-text text-muted">Leave blank to keep current image. Allowed formats: jpg, png, gif, svg, webp</div>
                         </div>
+=======
+            <div class="card">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control" name="name" value="<?= $product['name'] ?>" >
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"><?= $product['description'] ?></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Price</label>
+                        <input type="number" step="0.01" class="form-control" name="price" value="<?= $product['price'] ?>" >
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" name="is_available" id="is_available" <?= $product['is_available'] ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="is_available">Available</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" name="category" >
+                            <option value="" disabled>Select a category</option>
+                            <?php while($category = mysqli_fetch_assoc($categories_result)): ?>
+                                <option value="<?= $category['id'] ?>" <?= $category['id'] == $product['category_id'] ? 'selected' : '' ?>>
+                                    <?= $category['name'] ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Product Image</label>
+                        <?php if (!empty($product['image_url'])): ?>
+                            <div>
+                                <img src="<?= $product['image_url'] ?>" class="product-preview">
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" class="form-control" name="image" accept="image/*">
+                        <div class="form-text">Leave blank to keep current image. Allowed formats: jpg, png, gif, svg</div>
+>>>>>>> 890f3ba (update items  done)
                     </div>
                 </div>
                 
