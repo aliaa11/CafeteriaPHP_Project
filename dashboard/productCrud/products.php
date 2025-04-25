@@ -1185,12 +1185,11 @@ if(isset($_POST['addProduct'])) {
 
             if (mysqli_num_rows($result) > 0) {
             while ($product = mysqli_fetch_assoc($result)) {
-                $is_out_of_stock = $product['stock'] <= 0;
-                $is_low_stock = $product['stock'] > 0 && $product['stock'] <= 5;
+                $is_available = $product['is_available'];
                 ?>
                 
                 <div class="col">
-                    <div class="card h-100 product-card <?= $is_out_of_stock ? 'out-of-stock' : '' ?>">
+                    <div class="card h-100 product-card <?= !$is_available ? 'out-of-stock' : '' ?>">
                         <div class="card-img-container">
                             <?php if(!empty($product['image_url'])): ?>
                                 <img src="<?= $product['image_url'] ?>" class="card-img-top product-img" alt="<?= $product['name'] ?>">
@@ -1204,17 +1203,19 @@ if(isset($_POST['addProduct'])) {
                             <h5 class="card-title"><?= $product['name'] ?></h5>
                             <p class="card-text"><?= substr($product['description'], 0, 100) ?>...</p>
                             <p class="text-success fw-bold">Price: $<?= number_format($product['price'], 2) ?></p>
-                            <div class="stock-info <?= $is_low_stock ? 'low-stock' : '' ?>">
-                                Stock: <?= $product['stock'] ?>
+                            <div class="availability-info">
+                                Status: <span class="<?= $is_available ? 'text-available' : 'text-unavailable' ?>">
+                                    <?= $is_available ? 'Available' : 'Unavailable' ?>
+                                </span>
                             </div>
                             <p class="text-muted">Category: <?= $product['category_name'] ?></p>
                         </div>
                         <div class="card-footer bg-transparent">
-                            <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn btn-sm btn-primary me-2">Edit</a>
+                            <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn  btn-primary me-2">Edit</a>
                             <?php if($is_out_of_stock): ?>
-                                <button class="btn btn-sm btn-danger" disabled>Delete</button>
+                                <button class="btn  btn-danger" disabled>Delete</button>
                             <?php else: ?>
-                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $product['id'] ?>">Delete</button>
+                                <button class="btn  btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $product['id'] ?>">Delete</button>
                                 <!-- Delete Confirmation Modal -->
                             <div class="modal fade" id="deleteModal<?= $product['id'] ?>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -1233,7 +1234,6 @@ if(isset($_POST['addProduct'])) {
                                     </div>
                                 </div>
                             </div>
-                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -1283,7 +1283,7 @@ if(isset($_POST['addProduct'])) {
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Product Name</label>
-                            <input type="text" class="form-control" name="name">
+                            <input type="text" class="form-control" name="name" required>
                             <div class="invalid-feedback">Please enter the product name.</div>
                         </div>
                         <div class="mb-3">
@@ -1292,21 +1292,19 @@ if(isset($_POST['addProduct'])) {
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Price</label>
-                            <input type="number" step="0.01" class="form-control" name="price">
+                            <input type="number" step="0.01" class="form-control" name="price" required>
                             <div class="invalid-feedback">Please enter the price.</div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Stock</label>
-                            <input type="number" step="0.01" class="form-control" name="stock">
-                            <div class="invalid-feedback">Please enter the stock quantity.</div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="is_available" id="is_available" checked>
+                            <label class="form-check-label" for="is_available">Available</label>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Category</label>
-                            <select class="form-select" name="category">
+                            <select class="form-select" name="category" required>
                                 <option value="" selected disabled>Select a category</option>
                                 <?php
                                 $categories = mysqli_query($myConnection, "SELECT * FROM categories");
-                                print_r($category);
                                 while($category = mysqli_fetch_assoc($categories)) {
                                     echo "<option value='{$category['id']}'>{$category['name']}</option>";
                                 }
@@ -1334,20 +1332,23 @@ if(isset($_POST['addProduct'])) {
 </html>
 <?php
 if(isset($_POST['addProduct'])) {
-    $name =$_POST['name'];
+    $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
-    $stock = $_POST['stock'];
+    $is_available = isset($_POST['is_available']) ? 1 : 0;
     $category = $_POST['category'] ?? '';
+    
     if(empty($name) || empty($price) || empty($category)) {
         echo "<div class='alert alert-danger'>Please fill all required fields</div>";
         exit();
     }
+    
     if(isset($_FILES['image'])) {
         $fileName = $_FILES['image']['name'];
         $fileTmp = $_FILES['image']['tmp_name'];
         $fileSize = $_FILES['image']['size'];
         $fileError = $_FILES['image']['error'];
+        
         if(!empty($fileName) && !empty($fileTmp)) {
             $fileArray = explode(".", $fileName);
             $lastElementExt = strtolower(end($fileArray)); 
@@ -1364,18 +1365,22 @@ if(isset($_POST['addProduct'])) {
                             echo "<div class='alert alert-success'>Product added successfully</div>";
                             echo "<script>window.location.href = 'products.php';</script>";
                         } else {
-                            echo "<div class='alert alert-danger'>Error uploading file</div>";
+                            echo "<div class='alert alert-danger'>Error adding product: ".mysqli_error($myConnection)."</div>";
                         }
                     } else {
-                        echo "<div class='alert alert-danger'>File is too large (max 5MB)</div>";
+                        echo "<div class='alert alert-danger'>Error uploading file</div>";
                     }
                 } else {
-                    echo "<div class='alert alert-danger'>Error uploading file</div>";
+                    echo "<div class='alert alert-danger'>File is too large (max 5MB)</div>";
                 }
             } else {
-                echo "<div class='alert alert-danger'>Invalid file type. Allowed: jpg, png, gif, svg</div>";
+                echo "<div class='alert alert-danger'>Error uploading file</div>";
             }
+        } else {
+            echo "<div class='alert alert-danger'>Invalid file type. Allowed: jpg, png, gif, svg</div>";
         }
+    } else {
+        echo "<div class='alert alert-danger'>Please select an image</div>";
     }
 <<<<<<< HEAD
 }
