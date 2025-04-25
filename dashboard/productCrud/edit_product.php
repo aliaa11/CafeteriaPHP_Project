@@ -6,7 +6,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     exit();
 }
 
-$product_id = intval($_GET['id']);
+$product_id = $_GET['id'];
 
 $product_query = "SELECT * FROM items WHERE id = $product_id";
 $product_result = mysqli_query($myConnection, $product_query);
@@ -22,27 +22,28 @@ $categories_query = "SELECT * FROM categories";
 $categories_result = mysqli_query($myConnection, $categories_query);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
-    $name = mysqli_real_escape_string($myConnection, $_POST['name']);
-    $description = mysqli_real_escape_string($myConnection, $_POST['description']);
-    $price = floatval($_POST['price']);
-    $stock = intval($_POST['stock']);
-    $category_id = intval($_POST['category']);
+    $name = $_POST['name'];
+    $description = $_POST['description'];
+    $price = $_POST['price'];
+    $is_available = isset($_POST['is_available']) ? 1 : 0;
+    $category_id = $_POST['category'];
     
     $image_path = $product['image_url'];
     
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+    if (isset($_FILES['image'])) {
         $fileName = $_FILES['image']['name'];
         $fileTmp = $_FILES['image']['tmp_name'];
         $fileSize = $_FILES['image']['size'];
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'svg'];
+        $fileArray = explode(".", $fileName);
+        $lastElementExt = strtolower(end($fileArray)); 
+        $arr = ["png", "jpg", "gif", "svg"];
         
-        if (in_array($fileExt, $allowed) && $fileSize < 5000000) {
+        if (in_array($lastElementExt, $arr) && $fileSize < 5000000) {
             $fileNameNew = uniqid('', true).'.'.$fileExt;
-            $fileDestinationn = '../uploads/products/'.$fileNameNew;
+            $UpdatedImage = '../uploads/products/'.time().$fileName;
             
-            if (move_uploaded_file($fileTmp, $fileDestinationn)) {
-                $image_path = $fileDestinationn;
+            if (move_uploaded_file($fileTmp, $UpdatedImage)) {
+                $image_path = $UpdatedImage;
             }
         }
     }
@@ -51,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
                     name = '$name', 
                     description = '$description', 
                     price = $price, 
-                    stock = $stock, 
+                    is_available = $is_available, 
                     category_id = $category_id, 
                     image_url = '$image_path' 
                     WHERE id = $product_id";
@@ -94,27 +95,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label">Product Name</label>
-                        <input type="text" class="form-control" name="name" value="<?= htmlspecialchars($product['name']) ?>" required>
+                        <input type="text" class="form-control" name="name" value="<?= $product['name'] ?>" >
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea class="form-control" name="description" rows="3"><?= htmlspecialchars($product['description']) ?></textarea>
+                        <textarea class="form-control" name="description" rows="3"><?= $product['description'] ?></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Price</label>
-                        <input type="number" step="0.01" class="form-control" name="price" value="<?= htmlspecialchars($product['price']) ?>" required>
+                        <input type="number" step="0.01" class="form-control" name="price" value="<?= $product['price'] ?>" >
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Stock</label>
-                        <input type="number" class="form-control" name="stock" value="<?= htmlspecialchars($product['stock']) ?>" required>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" name="is_available" id="is_available" <?= $product['is_available'] ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="is_available">Available</label>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Category</label>
-                        <select class="form-select" name="category" required>
+                        <select class="form-select" name="category" >
                             <option value="" disabled>Select a category</option>
                             <?php while($category = mysqli_fetch_assoc($categories_result)): ?>
                                 <option value="<?= $category['id'] ?>" <?= $category['id'] == $product['category_id'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($category['name']) ?>
+                                    <?= $category['name'] ?>
                                 </option>
                             <?php endwhile; ?>
                         </select>
@@ -123,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
                         <label class="form-label">Product Image</label>
                         <?php if (!empty($product['image_url'])): ?>
                             <div>
-                                <img src="<?= htmlspecialchars($product['image_url']) ?>" class="product-preview">
+                                <img src="<?= $product['image_url'] ?>" class="product-preview">
                             </div>
                         <?php endif; ?>
                         <input type="file" class="form-control" name="image" accept="image/*">

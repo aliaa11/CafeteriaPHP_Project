@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once 'db.php';
+include_once './config/dbConnection.php';
 
 $errors = [];
 
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $allowed = ["png", "jpg", "jpeg", "gif"];
 
         if (in_array($ext, $allowed)) {
-            $newFileName = "uploads/" . time() . "_" . $fileName;
+            $newFileName = "./dashboard/uploads/users/" . time() . "_" . $fileName;
             move_uploaded_file($fileTmp, $newFileName);
             $profile_picture = $newFileName;
         } else {
@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($errors)) {
         $check_query = "SELECT id FROM users WHERE email = ?";
-        $stmt = mysqli_prepare($connection, $check_query);
+        $stmt = mysqli_prepare($myConnection, $check_query);
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $query = "INSERT INTO users (username, email, password, profile_picture) 
                       VALUES (?, ?, ?, ?)";
-            $stmt = mysqli_prepare($connection, $query);
+            $stmt = mysqli_prepare($myConnection, $query);
             mysqli_stmt_bind_param($stmt, "ssss", $username, $email, $hashedPassword, $profile_picture);
             if (mysqli_stmt_execute($stmt)) {
                 $_SESSION["username"] = $username;

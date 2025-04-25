@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once 'db.php';
+include_once './config/dbConnection.php';
 
 $errors = [];
 
@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($errors)) {
         // Check if user exists
         $query = "SELECT * FROM users WHERE email = ?";
-        $stmt = mysqli_prepare($connection, $query);
+        $stmt = mysqli_prepare($myConnection, $query);
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
