@@ -4,14 +4,23 @@ session_start();
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 include_once './config/dbConnection.php';
 =======
+=======
+>>>>>>> d048517 (some changes)
 include_once __DIR__ . "./confing/dbConnection.php";
 
 =======
 include_once './config/dbConnection.php';
 >>>>>>> 094ec04 (order status done)
+<<<<<<< HEAD
 >>>>>>> 000af98 (order status done)
+=======
+=======
+include_once 'db.php';
+>>>>>>> 38e6fff (some changes)
+>>>>>>> d048517 (some changes)
 
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
