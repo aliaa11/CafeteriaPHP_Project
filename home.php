@@ -1,19 +1,19 @@
 <?php
 session_start();
-include_once 'db.php';
+include_once __DIR__ . "./confing/dbConnection.php";
 
-// إنشاء جلسة للسلة لو مش موجودة
+
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-// التأكد من إن المستخدم مسجل دخول وجلب بياناته
+
 $user_data = null;
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     // تعديل: استخدام mysqli_query بدل Prepared Statement
     $user_query = "SELECT username, profile_picture FROM users WHERE id = $user_id";
-    $user_result = mysqli_query($connection, $user_query);
+    $user_result = mysqli_query($myConnection, $user_query);
     $user_data = mysqli_fetch_assoc($user_result);
 }
 
@@ -50,7 +50,7 @@ if (isset($_POST['remove_from_cart'])) {
 // جلب الفئات مع المنتجات
 $query = "SELECT items.*, categories.name AS category_name FROM items 
           JOIN categories ON items.category_id = categories.id";
-$result = mysqli_query($connection, $query);
+$result = mysqli_query($myConnection, $query);
 
 // تجهيز المنتجات حسب الفئة
 $categories = [];
