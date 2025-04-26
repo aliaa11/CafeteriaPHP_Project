@@ -2,6 +2,7 @@
 session_start();
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 include_once './config/dbConnection.php';
 
 if (!isset($_SESSION['cart'])) {
@@ -61,22 +62,29 @@ $cart_count = array_sum($_SESSION['cart']);
 =======
 include_once 'db.php';
 >>>>>>> b0afb19 (home,logout,cart,order)
+=======
+include_once __DIR__ . "./confing/dbConnection.php";
 
-// إنشاء جلسة للسلة لو مش موجودة
+>>>>>>> b944f28 (some changes)
+
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 63d3ef8 (my work for cafeteria project)
 =======
 // التأكد من إن المستخدم مسجل دخول وجلب بياناته
+=======
+
+>>>>>>> b944f28 (some changes)
 $user_data = null;
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     // تعديل: استخدام mysqli_query بدل Prepared Statement
     $user_query = "SELECT username, profile_picture FROM users WHERE id = $user_id";
-    $user_result = mysqli_query($connection, $user_query);
+    $user_result = mysqli_query($myConnection, $user_query);
     $user_data = mysqli_fetch_assoc($user_result);
 }
 
@@ -113,7 +121,7 @@ if (isset($_POST['remove_from_cart'])) {
 // جلب الفئات مع المنتجات
 $query = "SELECT items.*, categories.name AS category_name FROM items 
           JOIN categories ON items.category_id = categories.id";
-$result = mysqli_query($connection, $query);
+$result = mysqli_query($myConnection, $query);
 
 // تجهيز المنتجات حسب الفئة
 $categories = [];
