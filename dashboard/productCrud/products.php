@@ -264,7 +264,7 @@ if(isset($_POST['addProduct'])) {
             if(in_array($lastElementExt,$arr)) {
                 if($fileError === 0) {
                     if($fileSize < 200000000) { 
-                        $fileDestination = '../uploads/products/'.time().$fileName;
+                        $fileDestination = '../../uploads/'.time().$fileName;
                         if(move_uploaded_file($fileTmp, $fileDestination)) {
                             $sql = "INSERT INTO items (name, description, price, is_available, image_url, category_id) 
                             VALUES ('$name', '$description', $price, $is_available, '$fileDestination', $category)";

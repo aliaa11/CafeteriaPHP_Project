@@ -351,15 +351,15 @@ $cart_count = array_sum($_SESSION['cart']);
                                 <div class="col-sm-12 col-md-6 col-lg-4 all <?php echo htmlspecialchars(str_replace(' ', '-', strtolower($item['category_name']))); ?>">
                                     <div class="box">
                                         <div class="img-box order-item-img">
-                                            <!-- $_SERVER['DOCUMENT_ROOT'] . './dashboard/uploads/products/' .  -->
                                             <?php
-                                           $image_path = $_SERVER['DOCUMENT_ROOT'] . './dashboard/uploads/products/' . $item['image_url'];
-                                           if (file_exists($image_path)) {
-                                               echo "<img src='./dashboard/uploads/products/" . $item['image_url'] . "' alt='{$item['name']}' class='order-item-img'>";
-                                           } else {
-                                               echo "<img src='./dashboard/uploads/products/1745536704stack-pancakes.jpg' alt='{$item['name']}' class='order-item-img'>";
-                                           }
-                                           ?>
+                                            $image_path = $_SERVER['DOCUMENT_ROOT'] . '/cafateriapro/uploads/' . $item['image_url'];
+                                            echo "<!-- Debug: Image path = " . $image_path . " -->";
+                                            if (file_exists($image_path)):
+                                            ?>
+                                                <img src="/cafateriapro/uploads/<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="order-item-img">
+                                            <?php else: ?>
+                                                <p>Image not available</p>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="detail-box">
                                             <h5><?php echo htmlspecialchars($item['name']); ?></h5>
