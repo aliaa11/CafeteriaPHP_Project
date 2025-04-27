@@ -3,6 +3,7 @@
 
   position: relative;
   z-index: 100;
+
 }
 
 .sidebar-collapsed {
@@ -52,11 +53,6 @@
   background-color: rgba(13, 110, 253, 0.5);
 }
 
-.logo-txt {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #fff;
-}
 
 iframe {
   min-height: calc(100vh - 0px);
