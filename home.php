@@ -2,24 +2,19 @@
 session_start();
 include_once './config/dbConnection.php';
 
-// إنشاء جلسة للسلة لو مش موجودة
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-// التأكد من إن المستخدم مسجل دخول وجلب بياناته
 $user_data = null;
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    // تعديل: استخدام mysqli_query بدل Prepared Statement
     $user_query = "SELECT username, profile_picture FROM users WHERE id = $user_id";
     $user_result = mysqli_query($myConnection, $user_query);
     $user_data = mysqli_fetch_assoc($user_result);
 }
 
-// إضافة منتج للسلة
 if (isset($_POST['add_to_cart'])) {
-    // التأكد من إن المستخدم مسجل دخول
     if (!isset($_SESSION['user_id'])) {
         header("Location: login.php");
         exit();
@@ -34,12 +29,10 @@ if (isset($_POST['add_to_cart'])) {
         $_SESSION['cart'][$item_id] = $quantity;
     }
 
-    // تعديل: إلغاء AJAX واستخدام Redirect
     header("Location: home.php");
     exit();
 }
 
-// إزالة منتج من السلة
 if (isset($_POST['remove_from_cart'])) {
     $item_id = $_POST['remove_from_cart'];
     unset($_SESSION['cart'][$item_id]);
@@ -47,22 +40,20 @@ if (isset($_POST['remove_from_cart'])) {
     exit();
 }
 
-// جلب الفئات مع المنتجات
-$query = "SELECT items.*, categories.name AS category_name FROM items 
-          JOIN categories ON items.category_id = categories.id";
+$query = "SELECT items.*, categories.name AS category_name 
+FROM items 
+JOIN categories ON items.category_id = categories.id
+WHERE items.is_available = 1";
 $result = mysqli_query($myConnection, $query);
 
-// تجهيز المنتجات حسب الفئة
 $categories = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $catName = $row['category_name'];
     $categories[$catName][] = $row;
 }
 
-// إعادة ضبط المؤشر للاستخدام مرة أخرى
 mysqli_data_seek($result, 0);
 
-// حساب عدد العناصر في السلة
 $cart_count = array_sum($_SESSION['cart']);
 ?>
 
@@ -72,13 +63,9 @@ $cart_count = array_sum($_SESSION['cart']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feane Cafeteria - Home</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
     <style>
-        /* Hero Section with Carousel */
         .hero-section {
             position: relative;
             height: 500px;
@@ -293,10 +280,14 @@ $cart_count = array_sum($_SESSION['cart']);
                 <div class="d-flex align-items-center">
                     <?php if (isset($_SESSION['user_id']) && $user_data): ?>
                         <div class="d-flex align-items-center me-3">
-                            <?php if ($user_data['profile_picture']): ?>
-                                <img src="<?php echo htmlspecialchars($user_data['profile_picture']); ?>" alt="Profile Image" class="profile-img me-2">
-                            <?php else: ?>
-                                <img src="./dashboard/uploads/users/default.png" alt="Default Profile Image" class="profile-img me-2">
+                        <?php if ($user_data['profile_picture']): ?>
+                            <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/users/<?= htmlspecialchars($user_data['profile_picture']) ?>" 
+                                alt="Profile Image" 
+                                class="profile-img me-2">
+                            <?php else: ?>  
+                                <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/users/default.png" 
+                                alt="Default Profile Image" 
+                                class="profile-img me-2">
                             <?php endif; ?>
                             <span class="text-white">Welcome, <?php echo htmlspecialchars($user_data['username']); ?>!</span>
                         </div>
@@ -313,7 +304,6 @@ $cart_count = array_sum($_SESSION['cart']);
         </div>
     </nav>
 
-    <!-- Hero Section with Carousel -->
     <div class="hero-section">
         <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
@@ -350,15 +340,15 @@ $cart_count = array_sum($_SESSION['cart']);
                             <?php while ($item = mysqli_fetch_assoc($result)) : ?>
                                 <div class="col-sm-12 col-md-6 col-lg-4 all <?php echo htmlspecialchars(str_replace(' ', '-', strtolower($item['category_name']))); ?>">
                                     <div class="box">
-                                        <div class="img-box order-item-img">
-                                            <?php
-                                            $image_path = $_SERVER['DOCUMENT_ROOT'] . '/cafateriapro/uploads/' . $item['image_url'];
-                                            echo "<!-- Debug: Image path = " . $image_path . " -->";
-                                            if (file_exists($image_path)):
-                                            ?>
-                                                <img src="/cafateriapro/uploads/<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="order-item-img">
+                                        <div class="img-box">
+                                            <?php if (!empty($item['image_url'])): ?>
+                                                <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/<?= htmlspecialchars($item['image_url']) ?>" 
+                                                    alt="<?= htmlspecialchars($item['name']) ?>"
+                                                    class="order-item-img">
                                             <?php else: ?>
-                                                <p>Image not available</p>
+                                                <div class="no-image-placeholder">
+                                                    <i class="bi bi-image"></i>
+                                                </div>
                                             <?php endif; ?>
                                         </div>
                                         <div class="detail-box">

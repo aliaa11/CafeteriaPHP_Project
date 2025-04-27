@@ -87,11 +87,8 @@ $cart_count = array_sum($_SESSION['cart']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feane Cafeteria - Cart</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
     <style>
         body {
             background-color: #F5F5DC;
@@ -377,63 +374,66 @@ $cart_count = array_sum($_SESSION['cart']);
 
     <!-- Cart Section -->
     <section class="cart-section">
-        <h3>Your Cart</h3>
-        <?php
-        $total_price = 0;
-        if (!empty($_SESSION['cart'])) {
-            foreach ($_SESSION['cart'] as $item_id => $quantity) {
-                $item_query = "SELECT * FROM items WHERE id = $item_id";
-                $item_result = mysqli_query($myConnection, $item_query);
-                $item = mysqli_fetch_assoc($item_result);
+    <h3>Your Cart</h3>
+    <?php
+    $total_price = 0;
+    if (!empty($_SESSION['cart'])) {
+        foreach ($_SESSION['cart'] as $item_id => $quantity) {
+            $item_query = "SELECT * FROM items WHERE id = $item_id";
+            $item_result = mysqli_query($myConnection, $item_query);
+            $item = mysqli_fetch_assoc($item_result);
 
-                $subtotal = $item['price'] * $quantity;
-                $total_price += $subtotal;
-        ?>
-            <div class="cart-item">
-                <?php
-                $image_path = $_SERVER['DOCUMENT_ROOT'] . '/cafateriapro/uploads/' . $item['image_url'];
-                if (file_exists($image_path)):
-                ?>
-                    <img src="/cafateriapro/uploads/<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
-                <?php else: ?>
-                    <img src="https://via.placeholder.com/50" alt="Placeholder">
-                <?php endif; ?>
-                <div class="cart-item-details">
-                    <h6><?php echo htmlspecialchars($item['name']); ?></h6>
-                    <div class="subtotal"><?php echo $subtotal; ?> EGP</div>
-                </div>
-                <div class="quantity-controls">
-                    <form method="post" style="display: inline;">
-                        <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
-                        <input type="hidden" name="action" value="decrease">
-                        <button type="submit" name="update_quantity">-</button>
-                    </form>
-                    <span class="cart-quantity"><?php echo $quantity; ?></span>
-                    <form method="post" style="display: inline;">
-                        <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
-                        <input type="hidden" name="action" value="increase">
-                        <button type="submit" name="update_quantity">+</button>
-                    </form>
-                </div>
-                <form method="post" style="display: inline; margin-left: 10px;">
-                    <button type="submit" name="remove_from_cart" value="<?php echo $item_id; ?>" class="btn btn-sm btn-danger">X</button>
+            $subtotal = $item['price'] * $quantity;
+            $total_price += $subtotal;
+    ?>
+        <div class="cart-item">
+            <?php
+
+            if (!empty($item['image_url'])): ?>
+                <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/<?= htmlspecialchars($item['image_url']) ?>" 
+                    alt="<?= htmlspecialchars($item['name']) ?>"
+                    class="order-item-img">
+            <?php else: ?>
+                <div class="no-image-placeholder">
+                <i class="bi bi-image"></i>
+            </div>
+           <?php endif; ?>
+            <div class="cart-item-details">
+                <h6><?php echo htmlspecialchars($item['name']); ?></h6>
+                <div class="subtotal"><?php echo $subtotal; ?> EGP</div>
+            </div>
+
+            <div class="quantity-controls">
+                <form method="post" style="display: inline;">
+                    <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
+                    <input type="hidden" name="action" value="decrease">
+                    <button type="submit" name="update_quantity">-</button>
+                </form>
+                <span class="cart-quantity"><?php echo $quantity; ?></span>
+                <form method="post" style="display: inline;">
+                    <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
+                    <input type="hidden" name="action" value="increase">
+                    <button type="submit" name="update_quantity">+</button>
                 </form>
             </div>
-        <?php
-            }
-        } else {
-            echo "<p>Your cart is empty</p>";
-        }
-        ?>
-        <div class="total-price">
-            Total: <span id="total-price"><?php echo number_format($total_price, 2); ?> EGP</span>
+            <form method="post" style="display: inline; margin-left: 10px;">
+                <button type="submit" name="remove_from_cart" value="<?php echo $item_id; ?>" class="btn btn-sm btn-danger">X</button>
+            </form>
         </div>
+    <?php
+        }
+    } else {
+        echo "<p>Your cart is empty</p>";
+    }
+    ?>
+    <div class="total-price">
+        Total: <span id="total-price"><?php echo number_format($total_price, 2); ?> EGP</span>
+    </div>
 
-        <?php if (!empty($_SESSION['cart'])): ?>
-            <button type="button" class="btn btn-order" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">Order Now</button>
-        <?php endif; ?>
-    </section>
-
+    <?php if (!empty($_SESSION['cart'])): ?>
+        <button type="button" class="btn btn-order" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">Order Now</button>
+    <?php endif; ?>
+</section>
     <div class="modal fade" id="confirmOrderModal" tabindex="-1" aria-labelledby="confirmOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
