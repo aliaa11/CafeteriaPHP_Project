@@ -27,6 +27,19 @@
             --text-dark: #2d3436;
             --text-light: #f5f6fa;
         }
+        .alert-warning {
+    border-left-color: #ffc107;
+}
+
+.alert-dismissible .btn-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.alert p {
+    margin-bottom: 1rem;
+}
         
         body {
             background-color: var(--light-bg);
@@ -98,10 +111,11 @@
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             background: var(--card-bg);
+            z-index: -1;
         }
         
         .product-card:hover {
-            /* transform: translateY(-5px); */
+            transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
         
@@ -220,7 +234,12 @@
             background-color: var(--primary-color);
             color: white;
         }
-        
+        .modal {
+            z-index: 1060 !important;
+        }
+        .modal-backdrop {
+            z-index: 1040 !important;
+        }
         .modal-footer .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
@@ -332,55 +351,12 @@
                             </div>
                             <div class="card-footer bg-transparent">
                                 <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn btn-primary me-2"><i class="fas fa-edit me-2"></i>Edit</a>
-                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $product['id'] ?>">
-                                    <i class="fas fa-trash-alt me-2"></i>Delete
+                                <button class="btn btn-danger"  onclick="confirmDelete(<?= $product['id'] ?>, '<?= htmlspecialchars(addslashes($product['name'])) ?>')">
+                                     <i class="fas fa-trash-alt me-2"></i>Delete
                                 </button>
-                             <!-- In your products.php file, replace the delete modal section with this: -->
-                            <div class="modal fade" id="deleteModal<?= $product['id'] ?>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header bg-danger text-white">
-                                            <h5 class="modal-title" id="deleteModalLabel">
-                                                <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
-                                            </h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Are you sure you want to delete this product?</p>
-                                            <p class="text-danger fw-bold">
-                                                <i class="fas fa-exclamation-circle me-2"></i>This action cannot be undone!
-                                            </p>
-                                            
-                                            <div class="card mb-3">
-                                                <div class="card-body">
-                                                    <h5 class="card-title"><?= htmlspecialchars($product['name']) ?></h5>
-                                                    <p class="card-text"><?= htmlspecialchars(substr($product['description'], 0, 100)) ?>...</p>
-                                                    <div class="d-flex justify-content-between">
-                                                        <span class="text-primary fw-bold">Price: $<?= number_format($product['price'], 2) ?></span>
-                                                        <span class="badge <?= $product['is_available'] ? 'bg-success' : 'bg-danger' ?>">
-                                                            <?= $product['is_available'] ? 'Available' : 'Unavailable' ?>
-                                                        </span>
-                                                    </div>
-                                                    <p class="text-muted mt-2">
-                                                        <i class="fas fa-tag me-2"></i>Category: <?= htmlspecialchars($product['category_name']) ?>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                <i class="fas fa-times me-2"></i>Cancel
-                                            </button>
-                                            <a href="delete_product.php?id=<?= $product['id'] ?>" class="btn btn-danger">
-                                                <i class="fas fa-trash-alt me-2"></i>Delete
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             </div>
                         </div>
-                    </div>
+                    </div>    
                     <?php
                 }
             } else {
@@ -501,13 +477,13 @@
         </div>
     </div>
 
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Form validation
         (function () {
             'use strict'
             
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
             var forms = document.querySelectorAll('.needs-validation')
             
             // Loop over them and prevent submission
@@ -531,7 +507,83 @@
                 card.style.animationDelay = `${index * 0.1}s`;
             });
         });
+        //////
+        // Delete confirmation function
+function confirmDelete(productId, productName) {
+    // Create a Bootstrap alert dynamically
+    const container = document.getElementById('flashMessageContainer');
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+    alertDiv.setAttribute('role', 'alert');
+    alertDiv.innerHTML = `
+        <strong><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</strong>
+        <p>Are you sure you want to delete "${productName}"?</p>
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-sm btn-secondary me-2" onclick="dismissAlert(this)">
+                Cancel
+            </button>
+            <a href="delete_product.php?id=${productId}" class="btn btn-sm btn-danger">
+                <i class="fas fa-trash-alt me-1"></i> Delete
+            </a>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    container.appendChild(alertDiv);
+    
+    // Auto-dismiss after 10 seconds if not interacted with
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            bootstrap.Alert.getInstance(alertDiv).close();
+        }
+    }, 10000);
+}
+
+// Function to dismiss alert
+function dismissAlert(button) {
+    const alertDiv = button.closest('.alert');
+    bootstrap.Alert.getInstance(alertDiv).close();
+}
+        // Delete modal handling
+        document.addEventListener('DOMContentLoaded', function() {
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        
+        // Handle all delete buttons
+        document.querySelectorAll('[data-bs-target="#deleteModal"]').forEach(button => {
+            button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            const productName = this.getAttribute('data-product-name');
+            const productDesc = this.getAttribute('data-product-desc');
+            const productPrice = this.getAttribute('data-product-price');
+            const productStatus = this.getAttribute('data-product-status');
+            const productCategory = this.getAttribute('data-product-category');
+            
+            // Update modal content
+            document.getElementById('modalProductContent').innerHTML = `
+                <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">${productName}</h5>
+                    <p class="card-text">${productDesc}</p>
+                    <div class="d-flex justify-content-between">
+                    <span class="text-primary fw-bold">Price: $${productPrice}</span>
+                    <span class="badge ${productStatus === 'Available' ? 'bg-success' : 'bg-danger'}">
+                        ${productStatus}
+                    </span>
+                    </div>
+                    <p class="text-muted mt-2">
+                    <i class="fas fa-tag me-2"></i>Category: ${productCategory}
+                    </p>
+                </div>
+                </div>
+            `;
+            
+            // Update delete link
+            document.getElementById('confirmDeleteBtn').href = `delete_product.php?id=${productId}`;
+            });
+        });
+        });
     </script>
+    
 </body>
 </html>
 <?php

@@ -10,7 +10,15 @@
     <style>
       .sidebar {
         transition: all 0.3s;
+        background-color:rgb(75, 49, 102) !important;
       }
+      .logo-txt {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+      border-bottom:rgb(122, 102, 143)  solid 2px !important;
+    }
+
       .sidebar-collapsed {
         margin-left: -250px;
       }
@@ -40,8 +48,8 @@
 
     <div class="container-fluid">
       <div class="row min-vh-100">
-        <div id="sidebar" class="col-md-3 col-lg-2 bg-dark d-flex flex-column sidebar">
-          <div class="logo-txt p-3 border-bottom border-primary">Dashboard</div>
+        <div id="sidebar" class="col-md-3 col-lg-2 d-flex flex-column sidebar">
+          <div class="logo-txt p-3 ">Dashboard</div>
           <div class="flex-grow-1">
             <ul class="nav flex-column">
               <li class="nav-item">
