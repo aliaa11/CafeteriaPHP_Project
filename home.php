@@ -16,7 +16,7 @@ $user_data = null;
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     // تعديل: استخدام mysqli_query بدل Prepared Statement
-    $user_query = "SELECT username, profile_picture FROM users WHERE id = $user_id";
+    $user_query = "SELECT username, profile_picture FROM user WHERE id = $user_id";
     $user_result = mysqli_query($myConnection, $user_query);
     $user_data = mysqli_fetch_assoc($user_result);
 }
