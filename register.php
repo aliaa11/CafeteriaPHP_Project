@@ -3,46 +3,40 @@ session_start();
 include_once './config/dbConnection.php';
 
 $errors = [];
+define('USER_UPLOAD_DIR', '/opt/lampp/htdocs/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/users/');
+define('USER_PUBLIC_URL', '/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/users/');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST["username"]);
-    $email = trim($_POST["email"]);
-    $password = $_POST["password"];
-    $confirm = $_POST["confirm"];
-
-    if (empty($username) || empty($email) || empty($password) || empty($confirm)) {
-        $errors[] = "All fields are required.";
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Please enter a valid email.";
-    }
-
-    if ($password !== $confirm) {
-        $errors[] = "Passwords do not match.";
-    }
-
-    if (strlen($password) < 6) {
-        $errors[] = "Password must be at least 6 characters.";
-    }
-
-    // Handle profile picture
-    if (!empty($_FILES["profile_picture"]["name"])) {
-        $fileName = $_FILES["profile_picture"]["name"];
-        $fileTmp = $_FILES["profile_picture"]["tmp_name"];
-        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowed = ["png", "jpg", "jpeg", "gif"];
-
-        if (in_array($ext, $allowed)) {
-            $newFileName = "./dashboard/uploads/users/" . time() . "_" . $fileName;
-            move_uploaded_file($fileTmp, $newFileName);
-            $profile_picture = $newFileName;
-        } else {
-            $errors[] = "Invalid image format. Allowed: png, jpg, jpeg, gif";
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = mysqli_real_escape_string($myConnection, $_POST['username']);
+    $email = mysqli_real_escape_string($myConnection, $_POST['email']);
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    
+    $insert_query = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
+    
+    if (mysqli_query($myConnection, $insert_query)) {
+        $user_id = mysqli_insert_id($myConnection);
+        
+        $profile_picture = null;
+        if (!empty($_FILES['profile_picture']['name'])) {
+            $fileName = $_FILES['profile_picture']['name'];
+            $fileTmp = $_FILES['profile_picture']['tmp_name'];
+            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $allowedExt = ["png", "jpg", "jpeg", "gif"];
+            
+            if (in_array($fileExt, $allowedExt)) {
+                $newFilename = uniqid('user_', true) . '.' . $fileExt;
+                $targetPath = USER_UPLOAD_DIR . $newFilename;
+                
+                if (move_uploaded_file($fileTmp, $targetPath)) {
+                    $profile_picture = $newFilename;
+                    
+                    $update_query = "UPDATE users SET profile_picture = '$profile_picture' WHERE id = $user_id";
+                    mysqli_query($myConnection, $update_query);
+                }
+            }
         }
-    } else {
-        $profile_picture = "uploads/default.png";
-    }
+      }
 
     if (empty($errors)) {
         $check_query = "SELECT id FROM users WHERE email = ?";

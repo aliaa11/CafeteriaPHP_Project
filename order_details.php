@@ -152,6 +152,10 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
             background-color: #17A2B8;
             color: #FFF;
         }
+        .item-image
+        {
+            width:100px;
+        }
     </style>
 </head>
 <body>
@@ -204,6 +208,17 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
             <?php if (!empty($items)): ?>
                 <?php foreach ($items as $item): ?>
                     <div class="order-item">
+                        <div>
+                        <?php if (!empty($item['image_url'])): ?>
+                            <img class='item-image' src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/<?= htmlspecialchars($item['image_url']) ?> " 
+                                    alt="<?= htmlspecialchars($item['name']) ?>"
+                                    class="order-item-img">
+                            <?php else: ?>
+                                <div class="no-image-placeholder">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                         <div>
                             <h5><?= htmlspecialchars($item['name']) ?></h5>
                             <p><?= htmlspecialchars($item['description']) ?></p>
