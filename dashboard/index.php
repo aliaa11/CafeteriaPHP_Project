@@ -62,9 +62,10 @@
                 <a class="nav-link text-light" href="./productCrud/products.php" target="content-frame">Items</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link text-light" href="./orderCrud/orders.php" target="content-frame">Order Status</a>
-               //incoming changes
-                <a class="nav-link text-light" href="./orderStatusCrud/orders.php" target="content-frame">Order Status</a>
+                <a class="nav-link text-light" href="./orderCrud/orders.php" target="content-frame">Add Order</a>
+                <a class="nav-link text-light" href="./orderCrud/orders.php" target="content-frame">All Order</a>
+
+                <a class="nav-link text-light" href="./orderStatusCrud/orders.php" target="content-frame">Confirmed Orders</a>
               </li>
             </ul>
           </div>
