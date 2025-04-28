@@ -87,358 +87,376 @@ $cart_count = array_sum($_SESSION['cart']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feane Cafeteria - Cart</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #6a4c93;
+            --secondary-color: rgb(126, 105, 155);
+            --accent-color: #f8a5c2;
+            --light-bg: rgb(231, 231, 231);
+            --card-bg: #ffffff;
+            --text-dark: rgb(67, 38, 109);
+            --text-light: #f5f6fa;
+        }
+        
         body {
-            background-color: #F5F5DC;
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
             min-height: 100vh;
-            margin: 0;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
-
-        /* Navigation Bar */
+        
         .navbar {
-            background-color: transparent;
-            position: absolute;
-            top: 0;
-            width: 100%;
-            z-index: 3;
+            background-color: rgb(75, 49, 102);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
-        .navbar .navbar-brand {
-            color: #d2b48c; /* درجة بني فاتحة عشان كلمة Feane تبقى واضحة */
+        
+        .navbar-brand {
+            color: white;
+            font-weight: bold;
         }
-        .navbar .nav-link {
-            color: #8d5524; /* درجة بني غامق وواضح */
+        
+        .nav-link {
+            color: white;
             margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s;
         }
-        .navbar .nav-link:hover {
-            color: #6d3e1a;
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-color);
         }
-        .navbar .btn-order-online {
-            background-color: #8d5524;
+        
+        .btn-order-online {
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 20px;
             border-radius: 25px;
+            padding: 8px 20px;
         }
-        .navbar .btn-order-online:hover {
-            background-color: #6d3e1a;
+        
+        .btn-order-online:hover {
+            background-color: var(--secondary-color);
         }
-        .navbar .welcome-text {
-            color: #8d5524; /* نفس لون الروابط */
-        }
+        
         .cart-icon {
             position: relative;
-            margin-left: 10px;
+            margin-left: 15px;
         }
+        
         .cart-icon i {
             font-size: 1.5rem;
-            color: #d2b48c; /* درجة بني فاتحة عشان الأيقونة تبان */
+            color: var(--accent-color);
         }
-        .cart-icon .cart-count {
+        
+        .cart-count {
             position: absolute;
             top: -10px;
             right: -10px;
-            background-color: #8d5524;
+            background-color: var(--primary-color);
             color: white;
             border-radius: 50%;
             padding: 2px 6px;
             font-size: 0.8rem;
         }
-
+        
+        .profile-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        
         /* Latest Order Section */
         .latest-order {
-            background-color: #5C4033;
-            color: white;
-            padding: 15px;
-            border-radius: 15px;
-            margin: 80px auto 20px auto;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 100px auto 20px;
             max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
+        
         .latest-order h5 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #8d5524;
-            padding-bottom: 5px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            padding-bottom: 10px;
         }
-        .latest-order p {
-            margin: 5px 0;
-            color: #d2b48c;
-        }
-
+        
         /* Cart Section */
         .cart-section {
-            background-color: #5C4033;
-            color: white;
+            background-color: var(--card-bg);
             padding: 30px;
-            border-radius: 15px;
-            margin: 20px auto 30px auto;
+            border-radius: 12px;
+            margin:  auto;
+            width: 30%;
             max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
+        
         .cart-section h3 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #8d5524;
-            padding-bottom: 10px;
-            text-align: center;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 15px;
         }
+        
         .cart-item {
             display: flex;
             align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
-        .cart-item:last-child {
-            border-bottom: none;
-        }
+        
         .cart-item img {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             object-fit: cover;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-right: 15px;
         }
+        
         .cart-item-details {
             flex-grow: 1;
         }
+        
         .cart-item-details h6 {
-            margin: 0;
-            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 5px;
         }
-        .cart-item-details .subtotal {
-            font-size: 0.9rem;
-            color: #d2b48c;
-        }
+        
         .quantity-controls {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 10px;
         }
+        
         .quantity-controls button {
-            background-color: #8d5524;
+            background-color: var(--primary-color);
             color: white;
             border: none;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            width: 25px;
-            height: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        /* شيلنا تأثير الـ Hover */
-        .cart-section .btn-danger {
-            background-color: #8d5524;
-            border: none;
-            border-radius: 25px;
-            padding: 5px 10px;
+        
+        .btn-remove {
+            background-color: #dc3545 !important;
+            margin-left: 10px;
         }
-        /* شيلنا تأثير الـ Hover */
-        .cart-section .total-price {
-            font-size: 1.2rem;
+        
+        .total-price {
+            font-size: 1.3rem;
             font-weight: bold;
-            color: #d2b48c;
-            margin-top: 15px;
-            text-align: center;
+            color: var(--primary-color);
+            margin: 20px 0;
+            text-align: right;
         }
-        .cart-section .btn-order {
-            background-color: #8d5524;
+        
+        .btn-order {
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px;
+            padding: 12px;
             font-weight: bold;
             border-radius: 25px;
-            margin-top: 15px;
             width: 100%;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
         }
-        .cart-section .btn-order:hover {
-            background-color: #6d3e1a;
+        
+        .btn-order:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
         }
-
+        
         /* Modal Styles */
         .modal-content {
-            background-color: #5C4033;
-            color: white;
-            border-radius: 15px;
+            border-radius: 12px;
+            border: none;
         }
+        
         .modal-header {
-            border-bottom: 2px solid #8d5524;
-        }
-        .modal-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-        }
-        .modal-body .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .modal-body .cart-item:last-child {
+            background-color: var(--primary-color);
+            color: white;
             border-bottom: none;
+            border-radius: 12px 12px 0 0;
         }
-        .modal-body .total-price {
-            font-size: 1.2rem;
+        
+        .modal-title {
             font-weight: bold;
-            color: #d2b48c;
-            margin-top: 15px;
-            text-align: center;
         }
-        .modal-body .form-select {
-            background-color: #6d4c41;
-            color: white;
-            border: none;
-            border-radius: 10px;
+        
+        .modal-body .cart-item {
+            padding: 10px 0;
+        }
+        
+        .form-select {
+            border: 1px solid var(--secondary-color);
             padding: 10px;
+            margin-top: 15px;
         }
-        .modal-body .form-select:focus {
-            background-color: #6d4c41;
-            color: white;
-            box-shadow: none;
-            border: 1px solid #8d5524;
-        }
-        .modal-footer .btn-confirm {
-            background-color: #8d5524;
+        
+        .btn-confirm {
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 25px;
             border-radius: 25px;
         }
-        .modal-footer .btn-confirm:hover {
-            background-color: #6d3e1a;
-        }
-
-        /* Footer */
+        
         footer {
-            background-color: #5C4033;
+            background-color: var(--text-dark);
             color: white;
             padding: 30px 0;
             text-align: center;
+            margin-top: auto;
         }
+        
         footer a {
-            color: #d2b48c;
+            color: var(--accent-color);
             text-decoration: none;
-        }
-        footer a:hover {
-            color: #8d5524;
         }
     </style>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">Feane</a>
+            <a class="navbar-brand" href="#">Cafeteria</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="home.php">HOME</a>
+                        <a class="nav-link" href="home.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">MENU</a>
+                        <a class="nav-link" href="home.php#products-section">Menu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="my_orders.php">MY ORDERS</a>
+                        <a class="nav-link active" href="my_orders.php">My Orders</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
                     <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
-                    <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
+                    <a href="cart.php" class="cart-icon">
                         <i class="bi bi-cart"></i>
-                        <span class="cart-count"><?php echo $cart_count; ?></span>
+                        <span class="cart-count"><?= $cart_count ?></span>
                     </a>
                 </div>
             </div>
         </div>
     </nav>
-
     <!-- Latest Order Section -->
     <?php if ($latest_order): ?>
         <section class="latest-order">
             <h5>Latest Order</h5>
             <p><strong>Date:</strong> <?php echo htmlspecialchars($latest_order['order_date']); ?></p>
-            <p><strong>Status:</strong> <?php echo htmlspecialchars($latest_order['status']); ?></p>
-            <p><strong>Total:</strong> <?php echo htmlspecialchars($latest_order['total_price']); ?> EGP</p>
+            <p><strong>Status:</strong> 
+                <span class="badge 
+                    <?php 
+                    switch($latest_order['status']) {
+                        case 'pending': echo 'bg-warning'; break;
+                        case 'processing': echo 'bg-info'; break;
+                        case 'completed': echo 'bg-success'; break;
+                        case 'cancelled': echo 'bg-danger'; break;
+                        default: echo 'bg-secondary';
+                    }
+                    ?>">
+                    <?php echo htmlspecialchars($latest_order['status']); ?>
+                </span>
+            </p>
+            <p><strong>Total:</strong> <?php echo htmlspecialchars($latest_order['total_price']); ?> $</p>
         </section>
     <?php endif; ?>
 
     <!-- Cart Section -->
     <section class="cart-section">
-    <h3>Your Cart</h3>
-    <?php
-    $total_price = 0;
-    if (!empty($_SESSION['cart'])) {
-        foreach ($_SESSION['cart'] as $item_id => $quantity) {
-            $item_query = "SELECT * FROM items WHERE id = $item_id";
-            $item_result = mysqli_query($myConnection, $item_query);
-            $item = mysqli_fetch_assoc($item_result);
+        <h3 class="text-center">Your Cart</h3>
+        <?php
+        $total_price = 0;
+        if (!empty($_SESSION['cart'])) {
+            foreach ($_SESSION['cart'] as $item_id => $quantity) {
+                $item_query = "SELECT * FROM items WHERE id = $item_id";
+                $item_result = mysqli_query($myConnection, $item_query);
+                $item = mysqli_fetch_assoc($item_result);
 
-            $subtotal = $item['price'] * $quantity;
-            $total_price += $subtotal;
-    ?>
-        <div class="cart-item">
-            <?php
-
-            if (!empty($item['image_url'])): ?>
-                <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/<?= htmlspecialchars($item['image_url']) ?>" 
-                    alt="<?= htmlspecialchars($item['name']) ?>"
-                    class="order-item-img">
-            <?php else: ?>
-                <div class="no-image-placeholder">
-                <i class="bi bi-image"></i>
-            </div>
-           <?php endif; ?>
-            <div class="cart-item-details">
-                <h6><?php echo htmlspecialchars($item['name']); ?></h6>
-                <div class="subtotal"><?php echo $subtotal; ?> EGP</div>
-            </div>
-
-            <div class="quantity-controls">
-                <form method="post" style="display: inline;">
-                    <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
-                    <input type="hidden" name="action" value="decrease">
-                    <button type="submit" name="update_quantity">-</button>
+                $subtotal = $item['price'] * $quantity;
+                $total_price += $subtotal;
+        ?>
+            <div class="cart-item">
+                <?php if (!empty($item['image_url'])): ?>
+                    <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/<?= htmlspecialchars($item['image_url']) ?>" 
+                         alt="<?= htmlspecialchars($item['name']) ?>">
+                <?php else: ?>
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 8px;">
+                        <i class="bi bi-cup-hot text-muted"></i>
+                    </div>
+                <?php endif; ?>
+                
+                <div class="cart-item-details">
+                    <h6><?php echo htmlspecialchars($item['name']); ?></h6>
+                    <div class="text-muted">$ <?php echo $item['price']; ?>  x <?php echo $quantity; ?></div>
+                </div>
+                
+                <div class="quantity-controls">
+                    <form method="post" class="d-inline">
+                        <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
+                        <input type="hidden" name="action" value="decrease">
+                        <button type="submit" name="update_quantity" class="btn btn-sm">-</button>
+                    </form>
+                    
+                    <span><?php echo $quantity; ?></span>
+                    
+                    <form method="post" class="d-inline">
+                        <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
+                        <input type="hidden" name="action" value="increase">
+                        <button type="submit" name="update_quantity" class="btn btn-sm">+</button>
+                    </form>
+                </div>
+                
+                <form method="post" class="d-inline">
+                    <input type="hidden" name="remove_from_cart" value="<?php echo $item_id; ?>">
+                    <button type="submit" class="btn btn-sm btn-remove">X</button>
                 </form>
-                <span class="cart-quantity"><?php echo $quantity; ?></span>
-                <form method="post" style="display: inline;">
-                    <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
-                    <input type="hidden" name="action" value="increase">
-                    <button type="submit" name="update_quantity">+</button>
-                </form>
             </div>
-            <form method="post" style="display: inline; margin-left: 10px;">
-                <button type="submit" name="remove_from_cart" value="<?php echo $item_id; ?>" class="btn btn-sm btn-danger">X</button>
-            </form>
-        </div>
-    <?php
+        <?php
+            }
+        } else {
+            echo '<div class="text-center py-4">
+                    <i class="bi bi-cart-x" style="font-size: 3rem; color: var(--accent-color);"></i>
+                    <h5 class="mt-3">Your cart is empty</h5>
+                    <a href="home.php#products-section" class="btn btn-order-online mt-2">Browse Menu</a>
+                  </div>';
         }
-    } else {
-        echo "<p>Your cart is empty</p>";
-    }
-    ?>
-    <div class="total-price">
-        Total: <span id="total-price"><?php echo number_format($total_price, 2); ?> EGP</span>
-    </div>
+        ?>
+        
+        <?php if (!empty($_SESSION['cart'])): ?>
+            <div class="total-price">
+                Total: $ <?php echo number_format($total_price, 2); ?> 
+            </div>
+            
+            <button type="button" class="btn btn-order" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">
+                <i class="bi bi-bag-check me-2"></i> Place Order
+            </button>
+        <?php endif; ?>
+    </section>
 
-    <?php if (!empty($_SESSION['cart'])): ?>
-        <button type="button" class="btn btn-order" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">Order Now</button>
-    <?php endif; ?>
-</section>
+    <!-- Confirm Order Modal -->
     <div class="modal fade" id="confirmOrderModal" tabindex="-1" aria-labelledby="confirmOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmOrderModalLabel">Confirm Your Order</h5>
+                    <h5 class="modal-title">Confirm Your Order</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form method="POST" action="">
@@ -456,19 +474,18 @@ $cart_count = array_sum($_SESSION['cart']);
                         ?>
                             <div class="cart-item">
                                 <span><?php echo htmlspecialchars($item['name']); ?></span>
-                                <span class="cart-quantity"><?php echo $quantity; ?></span>
-                                <span><?php echo $subtotal; ?> EGP</span>
+                                <span><?php echo $quantity; ?> x <?php echo $item['price']; ?> EGP</span>
+                                <span class="fw-bold"><?php echo $subtotal; ?> EGP</span>
                             </div>
                         <?php
                             }
                         }
                         ?>
                         <div class="total-price">
-                            Total: <span><?php echo number_format($modal_total_price, 2); ?> EGP</span>
+                            Total: <?php echo number_format($modal_total_price, 2); ?> EGP
                         </div>
 
-                        <!-- Room Number Dropdown -->
-                        <div class="mt-3">
+                        <div class="mb-3">
                             <label for="room_number" class="form-label">Room Number</label>
                             <select name="room" id="room_number" class="form-select" required>
                                 <option value="">Select Room</option>
@@ -477,18 +494,26 @@ $cart_count = array_sum($_SESSION['cart']);
                                 <option value="103">103</option>
                                 <option value="104">104</option>
                                 <option value="105">105</option>
+                                <option value="106">106</option>
+                                <option value="107">107</option>
+                                <option value="108">108</option>
+                                <option value="109">109</option>
+                                <option value="110">110</option>
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" name="confirm_order" class="btn btn-confirm">Confirm</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="confirm_order" class="btn btn-confirm">
+                            <i class="bi bi-check-circle me-1"></i> Confirm Order
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
     <footer>
         <div class="container">
             <p>© 2025 Feane Cafeteria. All Rights Reserved.</p>
@@ -497,14 +522,6 @@ $cart_count = array_sum($_SESSION['cart']);
     </footer>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-

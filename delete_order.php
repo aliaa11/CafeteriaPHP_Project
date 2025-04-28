@@ -12,7 +12,7 @@ if (!isset($_GET['order_id']) || !is_numeric($_GET['order_id'])) {
     exit();
 }
 
-$order_id = $_GET['order_id'];
+$order_id = (int)$_GET['order_id'];
 $user_id = $_SESSION['user_id'];
 
 // Check if order belongs to user and is pending
@@ -29,19 +29,31 @@ if (!$order || $order['status'] !== 'pending') {
     exit();
 }
 
-// Delete order items first
-$delete_items_query = "DELETE FROM order_items WHERE order_id = ?";
-$stmt = mysqli_prepare($myConnection, $delete_items_query);
-mysqli_stmt_bind_param($stmt, "i", $order_id);
-mysqli_stmt_execute($stmt);
+// Begin transaction
+mysqli_begin_transaction($myConnection);
 
-// Then delete the order
-$delete_order_query = "DELETE FROM orders WHERE id = ?";
-$stmt = mysqli_prepare($myConnection, $delete_order_query);
-mysqli_stmt_bind_param($stmt, "i", $order_id);
-mysqli_stmt_execute($stmt);
+try {
+    // Delete order items first
+    $delete_items_query = "DELETE FROM order_items WHERE order_id = ?";
+    $stmt = mysqli_prepare($myConnection, $delete_items_query);
+    mysqli_stmt_bind_param($stmt, "i", $order_id);
+    mysqli_stmt_execute($stmt);
 
-$_SESSION['success'] = "Order cancelled successfully";
+    // Then delete the order
+    $delete_order_query = "DELETE FROM orders WHERE id = ?";
+    $stmt = mysqli_prepare($myConnection, $delete_order_query);
+    mysqli_stmt_bind_param($stmt, "i", $order_id);
+    mysqli_stmt_execute($stmt);
+
+    // Commit transaction
+    mysqli_commit($myConnection);
+    $_SESSION['success'] = "Order cancelled successfully";
+} catch (Exception $e) {
+    // Rollback transaction on error
+    mysqli_rollback($myConnection);
+    $_SESSION['error'] = "Failed to cancel order: " . $e->getMessage();
+}
+
 header("Location: my_orders.php");
 exit();
 ?>

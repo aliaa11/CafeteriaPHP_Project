@@ -17,7 +17,7 @@ if (!isset($_GET['order_id']) || !is_numeric($_GET['order_id'])) {
     exit();
 }
 
-$order_id = $_GET['order_id'];
+$order_id = (int)$_GET['order_id'];
 $user_id = $_SESSION['user_id'];
 
 $order_query = "SELECT o.*, u.username, u.email,
@@ -58,6 +58,7 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Details - Feane Cafeteria</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -72,7 +73,7 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
             --dark-color:rgb(73, 40, 121);
         }
         
-        body {
+        body {origin/arwa-new-changes
             background-color: var(--light-bg);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-image: linear-gradient(135deg, #f9f7f7 0%, #e8f4f8 100%);
@@ -294,6 +295,8 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
         .navbar .nav-link {
             color: var(--primary-color);
             margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s;
         }
         .navbar .nav-link:hover {
             color: var(--secondary-color);
@@ -303,7 +306,9 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
             color: white;
             border: none;
             padding: 8px 20px;
-            border-radius: 25px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: background-color 0.3s;
         }
         .navbar .btn-order-online:hover {
             background-color: var(--secondary-color);
@@ -313,7 +318,7 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
         }
         .cart-icon {
             position: relative;
-            margin-left: 10px;
+            margin-left: 15px;
         }
         .cart-icon i {
             font-size: 1.5rem;
@@ -329,33 +334,50 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
             padding: 2px 6px;
             font-size: 0.8rem;
         }
+        footer {
+            background-color: var(--text-dark);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        footer a:hover {
+            color: var(--primary-color);
+        }
+        
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">Feane</a>
+            <a class="navbar-brand" href="#">Cafeteria</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="home.php">HOME</a>
+                        <a class="nav-link active" href="home.php">HOME</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">MENU</a>
+                        <a class="nav-link" href="#products-section">MENU</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="my_orders.php">MY ORDERS</a>
+                        <a class="nav-link" href="my_orders.php">MY ORDERS</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
                     <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
-                    <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count"><?php echo $cart_count; ?></span>
+                    <a href="cart.php" class="cart-icon">
+                        <i class="bi bi-cart"></i>
+                        <span class="cart-count"><?= $cart_count ?></span>
                     </a>
                 </div>
             </div>
@@ -511,7 +533,19 @@ $items = mysqli_fetch_all($items_result, MYSQLI_ASSOC);
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2025 Luna Cafeteria. All Rights Reserved.</p>
+            <p>
+                <a href="#">Contact Us</a> | 
+                <a href="#">About Us</a> | 
+                <a href="#">Privacy Policy</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Add animation to table rows
         document.addEventListener('DOMContentLoaded', function() {

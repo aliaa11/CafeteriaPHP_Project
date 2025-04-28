@@ -40,7 +40,28 @@ if (isset($_POST['remove_from_cart'])) {
     exit();
 }
 
-// Modified query to get items with their latest order status and availability
+// Pagination setup
+$items_per_page = 6;
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($current_page < 1) $current_page = 1;
+$offset = ($current_page - 1) * $items_per_page;
+
+// Get total count of available items
+$count_query = "SELECT COUNT(*) as total FROM items WHERE is_available = 1";
+$count_result = mysqli_query($myConnection, $count_query);
+$count_row = mysqli_fetch_assoc($count_result);
+$total_items = $count_row['total'];
+$total_pages = ceil($total_items / $items_per_page);
+
+// Get categories for filtering
+$categories_query = "SELECT id, name FROM categories";
+$categories_result = mysqli_query($myConnection, $categories_query);
+$all_categories = [];
+while ($cat = mysqli_fetch_assoc($categories_result)) {
+    $all_categories[$cat['id']] = $cat['name'];
+}
+
+// Get items with pagination
 $query = "SELECT 
             items.*, 
             categories.name AS category_name,
@@ -52,18 +73,10 @@ $query = "SELECT
              JOIN order_items ON orders.id = order_items.order_id 
              WHERE order_items.item_id = items.id 
              ORDER BY orders.order_date DESC LIMIT 1) AS last_order_date
-          FROM items 
-          JOIN categories ON items.category_id = categories.id
-          WHERE items.is_available = 1";
+            FROM items 
+            JOIN categories ON items.category_id = categories.id
+            LIMIT $items_per_page OFFSET $offset";
 $result = mysqli_query($myConnection, $query);
-
-$categories = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $catName = $row['category_name'];
-    $categories[$catName][] = $row;
-}
-
-mysqli_data_seek($result, 0);
 
 $cart_count = array_sum($_SESSION['cart']);
 ?>
@@ -74,19 +87,92 @@ $cart_count = array_sum($_SESSION['cart']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feane Cafeteria - Home</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #6a4c93;
+            --secondary-color: rgb(126, 105, 155);
+            --accent-color: #f8a5c2;
+            --light-bg: rgb(231, 231, 231);
+            --card-bg: #ffffff;
+            --text-dark: rgb(67, 38, 109);
+            --text-light: #f5f6fa;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+        }
+        
+        .navbar {
+            background-color: rgb(75, 49, 102);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .navbar-brand {
+            color: white;
+            font-weight: bold;
+        }
+        
+        .nav-link {
+            color: white;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-color);
+        }
+        
+        .btn-order-online {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 20px;
+        }
+        
+        .btn-order-online:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .cart-icon {
+            position: relative;
+            margin-left: 15px;
+        }
+        
+        .cart-icon i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+        }
+        
         .hero-section {
             position: relative;
             height: 500px;
             color: white;
         }
+        
         .carousel-item {
             height: 500px;
             background-size: cover;
             background-position: center;
         }
+        
         .carousel-overlay {
             position: absolute;
             top: 0;
@@ -95,6 +181,7 @@ $cart_count = array_sum($_SESSION['cart']);
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
         }
+        
         .hero-content {
             position: absolute;
             top: 50%;
@@ -103,144 +190,95 @@ $cart_count = array_sum($_SESSION['cart']);
             text-align: left;
             z-index: 2;
         }
-        .hero-content h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            font-weight: 700;
-        }
-        .hero-content p {
-            font-size: 1.2rem;
-            margin: 20px 0;
-        }
-        .hero-content .btn-order {
-            background-color: #8d5524;
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            font-weight: bold;
-            border-radius: 25px;
-        }
-        .hero-content .btn-order:hover {
-            background-color: #6d3e1a;
-        }
-
-        /* Navigation Bar */
-        .navbar {
-            background-color: transparent;
-            position: absolute;
-            top: 0;
-            width: 100%;
-            z-index: 3;
-        }
-        .navbar .nav-link {
-            color: white;
-            margin: 0 15px;
-        }
-        .navbar .nav-link:hover {
-            color: #8d5524;
-        }
-        .navbar .btn-order-online {
-            background-color: #8d5524;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 25px;
-        }
-        .navbar .btn-order-online:hover {
-            background-color: #6d3e1a;
-        }
-        .cart-icon {
-            position: relative;
-            margin-left: 10px;
-        }
-        .cart-icon i {
-            font-size: 1.5rem;
-            color: white;
-        }
-        .cart-icon .cart-count {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background-color: #8d5524;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.8rem;
-        }
-        .profile-img {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        /* Products Section */
+        
         .food_section {
-            background-color: #F5F5DC;
-            padding: 50px 0;
+            padding: 100px 0 50px;
         }
+        
         .heading_container h2 {
             font-family: 'Playfair Display', serif;
-            color: #5C4033;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 30px;
         }
+        
         .filters_menu {
             display: flex;
             justify-content: center;
             list-style: none;
             padding: 0;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
+        
         .filters_menu li {
-            margin: 0 15px;
+            margin: 5px 10px;
             cursor: pointer;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border-radius: 20px;
-            color: #5C4033;
-            transition: background-color 0.3s;
+            color: var(--text-dark);
+            transition: all 0.3s;
+            border: 1px solid var(--primary-color);
         }
+        
         .filters_menu li.active {
-            background-color: #8d5524;
+            background-color: var(--primary-color);
             color: white;
         }
+        
         .box {
-            background-color: #5C4033;
-            color: white;
-            border-radius: 15px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
             overflow: hidden;
             margin-bottom: 20px;
             position: relative;
-            height: 400px;
+            height: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
         }
+        
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
         .img-box img {
             width: 100%;
-            height: 250px;
+            height: 300px;
             object-fit: cover;
-            cursor: pointer;
         }
+        
         .detail-box {
             padding: 20px;
-            color: white;
         }
+        
         .detail-box h5 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
+            color: var(--text-dark);
         }
+        
         .detail-box p {
             font-size: 0.9rem;
-            opacity: 0.8;
+            color: #6c757d;
         }
+        
         .options {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: 15px;
         }
+        
         .options h6 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            color: #d2b48c;
+            color: var(--primary-color);
+            margin: 0;
         }
+        
         .btn-add-to-cart {
-            background-color: #8d5524;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 50%;
@@ -250,26 +288,18 @@ $cart_count = array_sum($_SESSION['cart']);
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
+            transition: all 0.3s;
         }
+        
         .btn-add-to-cart:hover {
-            background-color: #6d3e1a;
+            background-color: var(--secondary-color);
         }
-
-        /* Footer */
-        footer {
-            background-color: #5C4033;
-            color: white;
-            padding: 30px 0;
-            text-align: center;
+        
+        .btn-add-to-cart:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
-        footer a {
-            color: #d2b48c;
-            text-decoration: none;
-        }
-        footer a:hover {
-            color: #8d5524;
-        }
-
+        
         .availability-badge {
             position: absolute;
             top: 10px;
@@ -280,22 +310,70 @@ $cart_count = array_sum($_SESSION['cart']);
             font-weight: bold;
             z-index: 2;
         }
-        .available {
-            background-color: #28a745;
-            color: white;
-        }
         .out-of-stock {
-            background-color: #dc3545;
+    background-color: #dc3545;
+    color: white;
+}
+
+.available {
+    background-color: #28a745;
+    color: white;
+}
+
+.filters_menu li {
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filters_menu li:hover {
+    background-color: var(--secondary-color);
+    color: white;
+}
+        
+        .pagination {
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .page-link {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            margin: 0 5px;
+            border-radius: 20px !important;
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
             color: white;
         }
-
+        
+        footer {
+            background-color: var(--text-dark);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        
+        .profile-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand text-white" href="#">Feane</a>
+            <a class="navbar-brand" href="#">Cafeteria</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -314,16 +392,16 @@ $cart_count = array_sum($_SESSION['cart']);
                 <div class="d-flex align-items-center">
                     <?php if (isset($_SESSION['user_id']) && $user_data): ?>
                         <div class="d-flex align-items-center me-3">
-                        <?php if ($user_data['profile_picture']): ?>
-                            <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/users/<?= htmlspecialchars($user_data['profile_picture']) ?>" 
-                                alt="Profile Image" 
-                                class="profile-img me-2">
+                            <?php if ($user_data['profile_picture']): ?>
+                                <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/users/<?= htmlspecialchars($user_data['profile_picture']) ?>" 
+                                    alt="Profile Image" 
+                                    class="profile-img">
                             <?php else: ?>  
                                 <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/users/default.png" 
-                                alt="Default Profile Image" 
-                                class="profile-img me-2">
+                                    alt="Default Profile Image" 
+                                    class="profile-img">
                             <?php endif; ?>
-                            <span class="text-white">Welcome, <?php echo htmlspecialchars($user_data['username']); ?>!</span>
+                            <span class="text-white"><?= htmlspecialchars($user_data['username']) ?></span>
                         </div>
                         <a href="logout.php" class="btn btn-order-online">Logout</a>
                     <?php else: ?>
@@ -331,13 +409,14 @@ $cart_count = array_sum($_SESSION['cart']);
                     <?php endif; ?>
                     <a href="cart.php" class="cart-icon">
                         <i class="bi bi-cart"></i>
-                        <span class="cart-count"><?php echo $cart_count; ?></span>
+                        <span class="cart-count"><?= $cart_count ?></span>
                     </a>
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <div class="hero-section">
         <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
@@ -350,79 +429,124 @@ $cart_count = array_sum($_SESSION['cart']);
         <div class="hero-content container">
             <h1>Feane Cafeteria</h1>
             <p>Enjoy a cozy experience with the best coffee and snacks in a warm atmosphere.</p>
-            <button class="btn btn-order" onclick="scrollToProducts()">Order Now</button>
+            <button class="btn btn-order-online" onclick="scrollToProducts()">Order Now</button>
         </div>
     </div>
 
     <!-- Food Section -->
-    <section class="food_section layout_padding-bottom" id="products-section">
-        <div class="container">
-            <div class="heading_container heading_center">
-                <h2>Our Menu</h2>
-            </div>
-            <ul class="filters_menu">
-                <li class="active" data-filter="*">All</li>
-                <li data-filter=".hot-drinks">Hot Drinks</li>
-                <li data-filter=".cold-drinks">Cold Drinks</li>
-                <li data-filter=".sweets">Sweets</li>
-            </ul>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="filters-content">
-                        <div class="row grid">
-                            <?php while ($item = mysqli_fetch_assoc($result)) : ?>
-                                <div class="col-sm-12 col-md-6 col-lg-4 all <?php echo htmlspecialchars(str_replace(' ', '-', strtolower($item['category_name']))); ?>">
-                                    <div class="box">
-                                        <!-- Availability badge at the top right -->
-                                        <span class="availability-badge <?php echo $item['is_available'] ? 'available' : 'out-of-stock'; ?>">
-                                            <?php echo $item['is_available'] ? 'Available' : 'Out of Stock'; ?>
-                                        </span>
-                                        
-                                        <div class="img-box">
-                                            <?php if (!empty($item['image_url'])): ?>
-                                                <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/<?= htmlspecialchars($item['image_url']) ?>" 
-                                                    alt="<?= htmlspecialchars($item['name']) ?>"
-                                                    class="order-item-img">
-                                            <?php else: ?>
-                                                <div class="no-image-placeholder">
-                                                    <i class="bi bi-image"></i>
-                                                </div>
-                                            <?php endif; ?>
+    <section class="food_section" id="products-section">
+    <div class="container">
+        <div class="heading_container">
+            <h2>Our Menu</h2>
+        </div>
+        <ul class="filters_menu">
+            <li class="active" data-filter="*">All</li>
+            <?php foreach ($all_categories as $cat_id => $cat_name): ?>
+                <li data-filter=".category-<?= $cat_id ?>"><?= htmlspecialchars($cat_name) ?></li>
+            <?php endforeach; ?>
+        </ul>
+        <div class="row">
+            <?php if (mysqli_num_rows($result) > 0): ?>
+                <?php while ($item = mysqli_fetch_assoc($result)): ?>
+                    <div class="col-sm-6 col-md-4 col-lg-4 mb-4 all category-<?= $item['category_id'] ?>">
+                        <div class="box">
+                            <span class="availability-badge <?= $item['is_available'] ? 'available' : 'out-of-stock' ?>">
+                                <?= $item['is_available'] ? 'Available' : 'Out of Stock' ?>
+                            </span>
+                                <div class="img-box">
+                                    <?php if (!empty($item['image_url'])): ?>
+                                        <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/<?= htmlspecialchars($item['image_url']) ?>" 
+                                            alt="<?= htmlspecialchars($item['name']) ?>">
+                                    <?php else: ?>
+                                        <div class="d-flex align-items-center justify-content-center" style="height: 250px; background: #f0f0f0;">
+                                            <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
                                         </div>
-                                        <div class="detail-box">
-                                        <?php if ($item['last_order_status']): ?>
-                                                <div class="order-status mb-2">
-                                                    <small class=" text-light">Last ordered: 
-                                                        </span>
-                                                        on <?php echo date('M j, Y', strtotime($item['last_order_date'])); ?>
-                                                    </small>
-                                                </div>
-                                            <?php endif; ?>
-                                            <h5><?php echo htmlspecialchars($item['name']); ?></h5>
-                                            <p><?php echo htmlspecialchars($item['description']); ?></p>
-                                            
-                                            <div class="options">
-                                                <h6>$<?php echo htmlspecialchars($item['price']); ?></h6>
-                                                <form method="post" style="display: inline;">
-                                                    <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
-                                                    <input type="hidden" name="quantity" value="1">
-                                                    <button type="submit" name="add_to_cart" class="btn btn-add-to-cart" <?php echo $item['is_available'] ? '' : 'disabled'; ?>>
-                                                        <i class="bi bi-cart"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="detail-box">
+                                    <?php if ($item['last_order_status']): ?>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Last ordered on <?= date('M j, Y', strtotime($item['last_order_date'])) ?></small>
                                         </div>
+                                    <?php endif; ?>
+                                    <h5><?= htmlspecialchars($item['name']) ?></h5>
+                                    <p><?= htmlspecialchars($item['description']) ?></p>
+                                    
+                                    <div class="options">
+                                        <h6>$<?= htmlspecialchars($item['price']) ?></h6>
+                                        <form method="post">
+                                            <input type="hidden" name="item_id" value="<?= $item['id'] ?>">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" name="add_to_cart" class="btn btn-add-to-cart" <?= $item['is_available'] ? '' : 'disabled' ?>>
+                                                <i class="bi bi-cart"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
-                            <?php endwhile; ?>
+                            </div>
                         </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-cup-hot" style="font-size: 3rem; color: var(--accent-color);"></i>
+                        <h4 class="mt-3">No items available</h4>
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
+
+            <!-- Pagination -->
+            <?php if ($total_pages > 1): ?>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <?php if ($current_page > 1): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?= $current_page - 1 ?>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+
+                        <?php 
+                        $start_page = max(1, $current_page - 2);
+                        $end_page = min($total_pages, $current_page + 2);
+                        
+                        if ($start_page > 1) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        
+                        for ($i = $start_page; $i <= $end_page; $i++): ?>
+                            <li class="page-item <?= $i == $current_page ? 'active' : '' ?>">
+                                <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; 
+                        
+                        if ($end_page < $total_pages) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        ?>
+
+                        <?php if ($current_page < $total_pages): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?= $current_page + 1 ?>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?= $total_pages ?>" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </nav>
+            <?php endif; ?>
         </div>
     </section>
-
-    <!-- End Food Section -->
 
     <!-- Footer -->
     <footer>
@@ -432,8 +556,8 @@ $cart_count = array_sum($_SESSION['cart']);
         </div>
     </footer>
 
-    <!-- Bootstrap JS and Custom JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/isotope-layout@3.0.6/dist/isotope.pkgd.min.js"></script>
     <script>
@@ -441,24 +565,20 @@ $cart_count = array_sum($_SESSION['cart']);
             document.getElementById('products-section').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Isotope Filter
         $(document).ready(function() {
-            var $grid = $('.grid').isotope({
-                itemSelector: '.all',
-                layoutMode: 'fitRows'
-            });
+    var $grid = $('.row').isotope({
+        itemSelector: '.col-sm-6',
+        layoutMode: 'fitRows'
+    });
 
-            $('.filters_menu li').click(function() {
-                $('.filters_menu li').removeClass('active');
-                $(this).addClass('active');
-                var filterValue = $(this).attr('data-filter');
-                $grid.isotope({ filter: filterValue });
-            });
-        });
+    $('.filters_menu li').click(function() {
+        $('.filters_menu li').removeClass('active');
+        $(this).addClass('active');
+        
+        var filterValue = $(this).attr('data-filter');
+        $grid.isotope({ filter: filterValue });
+    });
+});
     </script>
 </body>
 </html>
-
-
-
-

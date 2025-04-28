@@ -92,11 +92,9 @@ $result = mysqli_stmt_get_result($stmt);
         }
        
         .navbar {
-            background-color: transparent;
-            position: absolute;
-            top: 0;
-            width: 100%;
-            z-index: 3;
+            background-color: rgb(75, 49, 102);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
         
         .navbar-brand {
@@ -107,6 +105,8 @@ $result = mysqli_stmt_get_result($stmt);
         .nav-link {
             color: var(--primary-color);
             margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s;
         }
         
         .nav-link:hover, .nav-link.active {
@@ -131,7 +131,7 @@ $result = mysqli_stmt_get_result($stmt);
         
         .cart-icon {
             position: relative;
-            margin-left: 10px;
+            margin-left: 15px;
         }
         
         .cart-icon i {
@@ -334,6 +334,7 @@ $result = mysqli_stmt_get_result($stmt);
         footer a {
             color: var(--accent-color);
             text-decoration: none;
+            margin: 0 10px;
         }
         
         footer a:hover {
@@ -353,8 +354,8 @@ $result = mysqli_stmt_get_result($stmt);
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg">
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">Cafeteria</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -363,13 +364,13 @@ $result = mysqli_stmt_get_result($stmt);
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="home.php">HOME</a>
+                        <a class="nav-link" href="home.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">MENU</a>
+                        <a class="nav-link" href="home.php#products-section">Menu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="my_orders.php">MY ORDERS</a>
+                        <a class="nav-link active" href="my_orders.php">My Orders</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
@@ -377,7 +378,7 @@ $result = mysqli_stmt_get_result($stmt);
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
                     <a href="cart.php" class="cart-icon">
                         <i class="bi bi-cart"></i>
-                        <span class="cart-count"><?php echo $cart_count; ?></span>
+                        <span class="cart-count"><?= $cart_count ?></span>
                     </a>
                 </div>
             </div>
@@ -541,8 +542,12 @@ $result = mysqli_stmt_get_result($stmt);
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>© 2025 Feane Cafeteria. All Rights Reserved.</p>
-            <p><a href="#">Contact Us</a> | <a href="#">About Us</a> | <a href="#">Privacy Policy</a></p>
+            <p>© 2025 Luna Cafeteria. All Rights Reserved.</p>
+            <p>
+                <a href="#">Contact Us</a> | 
+                <a href="#">About Us</a> | 
+                <a href="#">Privacy Policy</a>
+            </p>
         </div>
     </footer>
 
