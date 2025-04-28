@@ -66,20 +66,31 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Feane Cafeteria</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
     <style>
-        /* Navigation Bar */
+        :root {
+            --primary-color: #6a4c93;
+            --secondary-color:rgb(126, 105, 155);
+            --accent-color: #f8a5c2;
+            --light-bg:rgb(231, 231, 231);
+            --card-bg: #ffffff;
+            --text-dark:rgb(67, 38, 109);
+            --text-light: #f5f6fa;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+        }
+       
         .navbar {
             background-color: transparent;
             position: absolute;
@@ -87,144 +98,257 @@ $result = mysqli_stmt_get_result($stmt);
             width: 100%;
             z-index: 3;
         }
-        .navbar .navbar-brand {
-            color: #d2b48c; /* درجة بني فاتحة عشان كلمة Feane تبقى واضحة */
+        
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
         }
-        .navbar .nav-link {
-            color: #8d5524; /* درجة بني غامق وواضح */
+        
+        .nav-link {
+            color: var(--primary-color);
             margin: 0 15px;
         }
-        .navbar .nav-link:hover {
-            color: #6d3e1a;
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--secondary-color);
         }
-        .navbar .btn-order-online {
-            background-color: #8d5524;
+        
+        .btn-order-online {
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 20px;
             border-radius: 25px;
+            padding: 8px 20px;
         }
-        .navbar .btn-order-online:hover {
-            background-color: #6d3e1a;
+        
+        .btn-order-online:hover {
+            background-color: var(--secondary-color);
         }
-        .navbar .welcome-text {
-            color: #8d5524; /* نفس لون الروابط */
+        
+        .welcome-text {
+            color: var(--primary-color);
         }
+        
         .cart-icon {
             position: relative;
             margin-left: 10px;
         }
+        
         .cart-icon i {
             font-size: 1.5rem;
-            color: #d2b48c; /* درجة بني فاتحة عشان الأيقونة تبان */
+            color: var(--accent-color);
         }
-        .cart-icon .cart-count {
+        
+        .cart-count {
             position: absolute;
             top: -10px;
             right: -10px;
-            background-color: #8d5524;
+            background-color: var(--primary-color);
             color: white;
             border-radius: 50%;
             padding: 2px 6px;
             font-size: 0.8rem;
         }
-
-        /* Orders Section */
+        
         .orders-section {
-            padding: 50px 0;
-            background-color: #F5F5DC;
+            padding: 100px 0 50px;
+            min-height: 100vh;
         }
-        .heading_container h2 {
+        
+        .heading-container h2 {
             font-family: 'Playfair Display', serif;
-            color: #5C4033;
+            color: var(--text-dark);
             text-align: center;
+            margin-bottom: 30px;
         }
-        .orders-section .form-label {
-            font-family: 'Playfair Display', serif;
-            color: #5C4033;
+        
+        .filter-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.1);
         }
-        .orders-section .form-control {
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-control {
             background-color: #f0f0f0;
-            color: #5C4033;
-            border: 1px solid #8d5524;
+            border: 1px solid var(--primary-color);
             border-radius: 5px;
-            padding: 8px;
         }
-        .orders-section .form-control:focus {
-            background-color: #f0f0f0;
-            color: #5C4033;
-            box-shadow: none;
-            border-color: #6d3e1a;
+        
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(141, 85, 36, 0.25);
+            border-color: var(--primary-color);
         }
-        .orders-section .btn-primary {
-            background-color: #8d5524;
+        
+        .order-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .order-header {
+            background-color: #6a4c93;
+            padding: 15px;
+            color:#ffff;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .order-body {
+            padding: 20px;
+        }
+        
+        .order-footer {
+            padding: 15px;
+            background-color: rgba(141, 85, 36, 0.05);
+            border-radius: 0 0 12px 12px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .order-id {
+            font-weight: bold;
+            color:#ffff;
+        }
+        
+        .order-date {
+            color:#ffff;
+            font-size: 0.9rem;
+        }
+        
+        .order-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .status-delivered {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+        
+        .status-canceled {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+        
+        .order-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .order-total {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        
+        .btn-view {
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 25px;
+            border-radius: 20px;
+            padding: 5px 15px;
         }
-        .orders-section .btn-primary:hover {
-            background-color: #6d3e1a;
+        
+        .btn-view:hover {
+            background-color: var(--secondary-color);
+            color: white;
         }
-        .orders-section .btn-danger {
-            background-color: #8d5524;
+        
+        .btn-cancel {
+            background-color: #dc3545;
+            color: white;
             border: none;
-            border-radius: 25px;
-            padding: 5px 10px;
+            border-radius: 20px;
+            padding: 5px 15px;
         }
-        .orders-section .btn-danger:hover {
-            background-color: #6d3e1a;
+        
+        .btn-cancel:hover {
+            background-color: #bb2d3b;
+            color: white;
         }
-        .orders-section .btn-warning {
-            background-color: #d2b48c;
-            color: #5C4033;
-            border: none;
-            border-radius: 25px;
-            padding: 5px 10px;
-        }
-        .orders-section .btn-warning:hover {
-            background-color: #b8976b;
-        }
-
-        /* Pagination Styles */
+        
         .pagination {
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 30px;
         }
-        .pagination .page-link {
-            background-color: #8d5524;
-            color: white;
-            border: none;
-            border-radius: 25px;
+        
+        .page-link {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
             margin: 0 5px;
-            padding: 8px 15px;
+            border-radius: 20px !important;
         }
-        .pagination .page-link:hover {
-            background-color: #6d3e1a;
+        
+        .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
         }
-        .pagination .page-item.disabled .page-link {
-            background-color: #6d4c41;
-            color: #d2b48c;
-            opacity: 0.7;
+        
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            border-color: #dee2e6;
         }
-        .pagination .page-item.active .page-link {
-            background-color: #d2b48c;
-            color: #5C4033;
-        }
-
-        /* Footer */
+        
         footer {
-            background-color: #5C4033;
+            background-color: var(--text-dark);
             color: white;
             padding: 30px 0;
             text-align: center;
         }
+        
         footer a {
-            color: #d2b48c;
+            color: var(--accent-color);
             text-decoration: none;
         }
+        
         footer a:hover {
-            color: #8d5524;
+            color: var(--primary-color);
+        }
+        
+        .no-orders {
+            text-align: center;
+            padding: 50px 0;
+        }
+        
+        .no-orders i {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -232,7 +356,7 @@ $result = mysqli_stmt_get_result($stmt);
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="#">Feane</a>
+            <a class="navbar-brand" href="#">Cafeteria</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -251,7 +375,7 @@ $result = mysqli_stmt_get_result($stmt);
                 <div class="d-flex align-items-center">
                     <span class="welcome-text me-3">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
                     <a href="logout.php" class="btn btn-order-online">Logout</a>
-                    <a href="cart.php" class="cart-icon" onclick="window.location.href='cart.php'; return false;">
+                    <a href="cart.php" class="cart-icon">
                         <i class="bi bi-cart"></i>
                         <span class="cart-count"><?php echo $cart_count; ?></span>
                     </a>
@@ -263,138 +387,156 @@ $result = mysqli_stmt_get_result($stmt);
     <!-- Orders Section -->
     <section class="orders-section">
         <div class="container">
-            <div class="heading_container">
+            <div class="heading-container">
                 <h2>My Orders</h2>
             </div>
 
-            <div class="row mb-4">
-    <div class="col-md-6">
-        <form method="GET" class="row g-3">
-            <div class="col-md-5">
-                <label for="date_from" class="form-label">From Date</label>
-                <input type="date" class="form-control" id="date_from" name="date_from" 
-                       value="<?= htmlspecialchars($date_from) ?>">
+            <!-- Filter Card -->
+            <div class="filter-card">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-5">
+                        <label for="date_from" class="form-label">From Date</label>
+                        <input type="date" class="form-control" id="date_from" name="date_from" 
+                               value="<?= htmlspecialchars($date_from) ?>">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="date_to" class="form-label">To Date</label>
+                        <input type="date" class="form-control" id="date_to" name="date_to" 
+                               value="<?= htmlspecialchars($date_to) ?>">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <?php if ($date_from || $date_to): ?>
+                            <a href="my_orders.php" class="btn btn-outline-secondary ms-2">Clear</a>
+                        <?php endif; ?>
+                    </div>
+                    <input type="hidden" name="page" value="1">
+                </form>
             </div>
-            <div class="col-md-5">
-                <label for="date_to" class="form-label">To Date</label>
-                <input type="date" class="form-control" id="date_to" name="date_to" 
-                       value="<?= htmlspecialchars($date_to) ?>">
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary">Filter</button>
-                <?php if ($date_from || $date_to): ?>
-                    <a href="my_orders.php" class="btn btn-secondary ms-2">Clear</a>
+
+            <!-- Orders Cards -->
+            <div class="row">
+                <?php if (mysqli_num_rows($result) > 0): ?>
+                    <?php while ($order = mysqli_fetch_assoc($result)): ?>
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="order-card h-100">
+                                <div class="order-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="order-id">Order #<?= $order['id'] ?></span>
+                                        <span class="order-date ms-2"><?= date('M j, Y', strtotime($order['order_date'])) ?></span>
+                                    </div>
+                                    <span class="order-status status-<?= strtolower($order['status']) ?>">
+                                        <?= ucfirst($order['status']) ?>
+                                    </span>
+                                </div>
+                                <div class="order-body">
+                                    <h6 class="mb-3">Items Ordered:</h6>
+                                    <?php 
+                                    $items = explode(', ', $order['items_list']);
+                                    foreach ($items as $item): ?>
+                                        <div class="order-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            <?= htmlspecialchars($item) ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <div class="order-footer d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="text-muted">Room:</span>
+                                        <strong class="ms-2"><?= htmlspecialchars($order['room_number']) ?></strong>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="text-muted">Total:</span>
+                                        <span class="order-total ms-2"><?= number_format($order['total_price'], 2) ?> EGP</span>
+                                    </div>
+                                </div>
+                                <div class="p-3 d-flex justify-content-between">
+                                    <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-view">
+                                        <i class="bi bi-eye-fill me-1"></i> View Details
+                                    </a>
+                                    <?php if ($order['status'] == 'pending'): ?>
+                                        <a href="delete_order.php?order_id=<?= $order['id'] ?>" class="btn btn-cancel" onclick="return confirm('Are you sure you want to cancel this order?');">
+                                            <i class="bi bi-x-circle-fill me-1"></i> Cancel
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <div class="no-orders col-12">
+                        <i class="bi bi-clipboard-x"></i>
+                        <h4>No orders found</h4>
+                        <p class="text-muted">Try adjusting your date filters</p>
+                    </div>
                 <?php endif; ?>
             </div>
-            <input type="hidden" name="page" value="1">
-        </form>
-    </div>
-</div>
 
-            <?php if (mysqli_num_rows($result) > 0): ?>
-                <table class="table">
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Items</th>
-                        <th>Total</th>
-                        <th>Room</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                    <?php while ($order = mysqli_fetch_assoc($result)): ?>
-                        <tr>
-                            <td><?= $order['id'] ?></td>
-                            <td><?= htmlspecialchars($order['items_list']) ?></td>
-                            <td><?= number_format($order['total_price'], 2) ?> EGP</td>
-                            <td><?= htmlspecialchars($order['room_number']) ?></td>
-                            <td>
-                                <span class="badge 
-                                    <?= $order['status'] == 'pending' ? 'bg-warning text-dark' : 
-                                       ($order['status'] == 'confirmed' ? 'bg-primary' : 
-                                       ($order['status'] == 'delivered' ? 'bg-success' : 'bg-danger')) ?>">
-                                    <?= ucfirst($order['status']) ?>
-                                </span>
-                            </td>
-                            <td><?= $order['order_date'] ?></td>
-                            <td>
-                                <a href="order_details.php?order_id=<?= $order['id'] ?>" class="btn btn-primary ">View</a>
-                                <?php if ($order['status'] == 'pending'): ?>
-                                    <a href="delete_order.php?order_id=<?= $order['id'] ?>" class="btn btn-danger p-2">Cancel</a>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                </table>
+            <!-- Pagination -->
+            <?php if ($total_pages > 1): ?>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <?php if ($current_page > 1): ?>
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>" 
+                                   aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="?<?= http_build_query(array_merge($_GET, ['page' => $current_page - 1])) ?>" 
+                                   aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
 
-                <?php if ($total_pages > 1): ?>
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            <?php if ($current_page > 1): ?>
-                <li class="page-item">
-                    <a class="page-link" 
-                       href="?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>" 
-                       aria-label="First">
-                        <span aria-hidden="true">&laquo;&laquo;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" 
-                       href="?<?= http_build_query(array_merge($_GET, ['page' => $current_page - 1])) ?>" 
-                       aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            <?php endif; ?>
+                        <?php 
+                        // Show page numbers
+                        $start_page = max(1, $current_page - 2);
+                        $end_page = min($total_pages, $current_page + 2);
+                        
+                        if ($start_page > 1) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        
+                        for ($i = $start_page; $i <= $end_page; $i++): ?>
+                            <li class="page-item <?= $i == $current_page ? 'active' : '' ?>">
+                                <a class="page-link" 
+                                   href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>">
+                                    <?= $i ?>
+                                </a>
+                            </li>
+                        <?php endfor; 
+                        
+                        if ($end_page < $total_pages) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        ?>
 
-            <?php 
-            // Show page numbers
-            $start_page = max(1, $current_page - 2);
-            $end_page = min($total_pages, $current_page + 2);
-            
-            if ($start_page > 1) {
-                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-            }
-            
-            for ($i = $start_page; $i <= $end_page; $i++): ?>
-                <li class="page-item <?= $i == $current_page ? 'active' : '' ?>">
-                    <a class="page-link" 
-                       href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>">
-                        <?= $i ?>
-                    </a>
-                </li>
-            <?php endfor; 
-            
-            if ($end_page < $total_pages) {
-                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-            }
-            ?>
-
-            <?php if ($current_page < $total_pages): ?>
-                <li class="page-item">
-                    <a class="page-link" 
-                       href="?<?= http_build_query(array_merge($_GET, ['page' => $current_page + 1])) ?>" 
-                       aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" 
-                       href="?<?= http_build_query(array_merge($_GET, ['page' => $total_pages])) ?>" 
-                       aria-label="Last">
-                        <span aria-hidden="true">&raquo;&raquo;</span>
-                    </a>
-                </li>
-            <?php endif; ?>
-        </ul>
-    </nav>
-<?php endif; ?>
-            <?php else: ?>
-                <p>No orders found for the selected date range.</p>
+                        <?php if ($current_page < $total_pages): ?>
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="?<?= http_build_query(array_merge($_GET, ['page' => $current_page + 1])) ?>" 
+                                   aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="?<?= http_build_query(array_merge($_GET, ['page' => $total_pages])) ?>" 
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </nav>
             <?php endif; ?>
         </div>
     </section>
-
 
     <!-- Footer -->
     <footer>
@@ -405,34 +547,25 @@ $result = mysqli_stmt_get_result($stmt);
     </footer>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const dateFrom = document.getElementById('date_from');
-        const dateTo = document.getElementById('date_to');
-        
-        if (dateFrom && dateTo) {
-            dateFrom.addEventListener('change', function() {
-                if (this.value && dateTo.value && this.value > dateTo.value) {
-                    dateTo.value = this.value;
-                }
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateFrom = document.getElementById('date_from');
+            const dateTo = document.getElementById('date_to');
             
-            dateTo.addEventListener('change', function() {
-                if (this.value && dateFrom.value && this.value < dateFrom.value) {
-                    dateFrom.value = this.value;
-                }
-            });
-        }
-    });
-</script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+            if (dateFrom && dateTo) {
+                dateFrom.addEventListener('change', function() {
+                    if (this.value && dateTo.value && this.value > dateTo.value) {
+                        dateTo.value = this.value;
+                    }
+                });
+                
+                dateTo.addEventListener('change', function() {
+                    if (this.value && dateFrom.value && this.value < dateFrom.value) {
+                        dateFrom.value = this.value;
+                    }
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-

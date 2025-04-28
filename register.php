@@ -48,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_num_rows($result) > 0) {
             $errors[] = "Email already registered.";
         } else {
+            
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $query = "INSERT INTO users (username, email, password, profile_picture) 
                       VALUES (?, ?, ?, ?)";

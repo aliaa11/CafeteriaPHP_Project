@@ -40,10 +40,21 @@ if (isset($_POST['remove_from_cart'])) {
     exit();
 }
 
-$query = "SELECT items.*, categories.name AS category_name 
-FROM items 
-JOIN categories ON items.category_id = categories.id
-WHERE items.is_available = 1";
+// Modified query to get items with their latest order status and availability
+$query = "SELECT 
+            items.*, 
+            categories.name AS category_name,
+            (SELECT status FROM orders 
+             JOIN order_items ON orders.id = order_items.order_id 
+             WHERE order_items.item_id = items.id 
+             ORDER BY orders.order_date DESC LIMIT 1) AS last_order_status,
+            (SELECT order_date FROM orders 
+             JOIN order_items ON orders.id = order_items.order_id 
+             WHERE order_items.item_id = items.id 
+             ORDER BY orders.order_date DESC LIMIT 1) AS last_order_date
+          FROM items 
+          JOIN categories ON items.category_id = categories.id
+          WHERE items.is_available = 1";
 $result = mysqli_query($myConnection, $query);
 
 $categories = [];
@@ -197,15 +208,18 @@ $cart_count = array_sum($_SESSION['cart']);
             border-radius: 15px;
             overflow: hidden;
             margin-bottom: 20px;
+            position: relative;
+            height: 400px;
         }
         .img-box img {
             width: 100%;
-            height: 200px;
+            height: 250px;
             object-fit: cover;
             cursor: pointer;
         }
         .detail-box {
             padding: 20px;
+            color: white;
         }
         .detail-box h5 {
             font-size: 1.5rem;
@@ -255,6 +269,26 @@ $cart_count = array_sum($_SESSION['cart']);
         footer a:hover {
             color: #8d5524;
         }
+
+        .availability-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+        .available {
+            background-color: #28a745;
+            color: white;
+        }
+        .out-of-stock {
+            background-color: #dc3545;
+            color: white;
+        }
+
     </style>
 </head>
 <body>
@@ -333,13 +367,17 @@ $cart_count = array_sum($_SESSION['cart']);
                 <li data-filter=".sweets">Sweets</li>
             </ul>
             <div class="row">
-                <!-- Products -->
                 <div class="col-md-12">
                     <div class="filters-content">
                         <div class="row grid">
                             <?php while ($item = mysqli_fetch_assoc($result)) : ?>
                                 <div class="col-sm-12 col-md-6 col-lg-4 all <?php echo htmlspecialchars(str_replace(' ', '-', strtolower($item['category_name']))); ?>">
                                     <div class="box">
+                                        <!-- Availability badge at the top right -->
+                                        <span class="availability-badge <?php echo $item['is_available'] ? 'available' : 'out-of-stock'; ?>">
+                                            <?php echo $item['is_available'] ? 'Available' : 'Out of Stock'; ?>
+                                        </span>
+                                        
                                         <div class="img-box">
                                             <?php if (!empty($item['image_url'])): ?>
                                                 <img src="/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/<?= htmlspecialchars($item['image_url']) ?>" 
@@ -352,14 +390,23 @@ $cart_count = array_sum($_SESSION['cart']);
                                             <?php endif; ?>
                                         </div>
                                         <div class="detail-box">
+                                        <?php if ($item['last_order_status']): ?>
+                                                <div class="order-status mb-2">
+                                                    <small class=" text-light">Last ordered: 
+                                                        </span>
+                                                        on <?php echo date('M j, Y', strtotime($item['last_order_date'])); ?>
+                                                    </small>
+                                                </div>
+                                            <?php endif; ?>
                                             <h5><?php echo htmlspecialchars($item['name']); ?></h5>
                                             <p><?php echo htmlspecialchars($item['description']); ?></p>
+                                            
                                             <div class="options">
                                                 <h6>$<?php echo htmlspecialchars($item['price']); ?></h6>
                                                 <form method="post" style="display: inline;">
                                                     <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
                                                     <input type="hidden" name="quantity" value="1">
-                                                    <button type="submit" name="add_to_cart" class="btn btn-add-to-cart">
+                                                    <button type="submit" name="add_to_cart" class="btn btn-add-to-cart" <?php echo $item['is_available'] ? '' : 'disabled'; ?>>
                                                         <i class="bi bi-cart"></i>
                                                     </button>
                                                 </form>
@@ -374,6 +421,7 @@ $cart_count = array_sum($_SESSION['cart']);
             </div>
         </div>
     </section>
+
     <!-- End Food Section -->
 
     <!-- Footer -->

@@ -1,8 +1,7 @@
 <?php
     include_once __DIR__ . "/../../config/dbConnection.php";
-    if (!$myConnection) {
-      die("Database connection failed");
-  }
+
+
   $items_per_page = 6; 
   $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
   if ($current_page < 1) $current_page = 1;
@@ -28,18 +27,18 @@
             --text-light: #f5f6fa;
         }
         .alert-warning {
-    border-left-color: #ffc107;
-}
+         border-left-color: #ffc107;
+         }
 
-.alert-dismissible .btn-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
+        .alert-dismissible .btn-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
 
-.alert p {
-    margin-bottom: 1rem;
-}
+        .alert p {
+            margin-bottom: 1rem;
+        }
         
         body {
             background-color: var(--light-bg);
@@ -509,41 +508,41 @@
         });
         //////
         // Delete confirmation function
-function confirmDelete(productId, productName) {
-    // Create a Bootstrap alert dynamically
-    const container = document.getElementById('flashMessageContainer');
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-warning alert-dismissible fade show';
-    alertDiv.setAttribute('role', 'alert');
-    alertDiv.innerHTML = `
-        <strong><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</strong>
-        <p>Are you sure you want to delete "${productName}"?</p>
-        <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-sm btn-secondary me-2" onclick="dismissAlert(this)">
-                Cancel
-            </button>
-            <a href="delete_product.php?id=${productId}" class="btn btn-sm btn-danger">
-                <i class="fas fa-trash-alt me-1"></i> Delete
-            </a>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    
-    container.appendChild(alertDiv);
-    
-    // Auto-dismiss after 10 seconds if not interacted with
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
+        function confirmDelete(productId, productName) {
+            // Create a Bootstrap alert dynamically
+            const container = document.getElementById('flashMessageContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.innerHTML = `
+                <strong><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</strong>
+                <p>Are you sure you want to delete "${productName}"?</p>
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-secondary me-2" onclick="dismissAlert(this)">
+                        Cancel
+                    </button>
+                    <a href="delete_product.php?id=${productId}" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Delete
+                    </a>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            container.appendChild(alertDiv);
+            
+            // Auto-dismiss after 10 seconds if not interacted with
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    bootstrap.Alert.getInstance(alertDiv).close();
+                }
+            }, 10000);
+        }
+
+        // Function to dismiss alert
+        function dismissAlert(button) {
+            const alertDiv = button.closest('.alert');
             bootstrap.Alert.getInstance(alertDiv).close();
         }
-    }, 10000);
-}
-
-// Function to dismiss alert
-function dismissAlert(button) {
-    const alertDiv = button.closest('.alert');
-    bootstrap.Alert.getInstance(alertDiv).close();
-}
         // Delete modal handling
         document.addEventListener('DOMContentLoaded', function() {
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));

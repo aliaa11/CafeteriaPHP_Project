@@ -2,11 +2,7 @@
 session_start();
 include_once __DIR__ . "/../../config/dbConnection.php";
 
-// Check admin privileges
-// if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
-//     header("Location: login.php");
-//     exit();
-// }
+
 
 if (!isset($_GET['order_id']) || !is_numeric($_GET['order_id'])) {
     header("Location: orders.php");

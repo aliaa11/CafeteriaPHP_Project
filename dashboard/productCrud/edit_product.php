@@ -1,5 +1,8 @@
 <?php
 include_once __DIR__ . "/../../config/dbConnection.php";
+
+
+
 define('UPLOAD_DIR', '/opt/lampp/htdocs/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/');
 define('PUBLIC_URL', '/cafeteriaPHP/CafeteriaPHP_Project/Public/uploads/products/');
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {

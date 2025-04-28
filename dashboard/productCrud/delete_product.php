@@ -1,9 +1,7 @@
 <?php
 include_once __DIR__ . "/../../config/dbConnection.php";
 
-if (!$myConnection) {
-    die("Database connection failed");
-}
+
 
 if(isset($_GET['id'])) {
     $product_id = $_GET['id'];

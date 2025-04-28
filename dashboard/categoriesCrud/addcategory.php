@@ -1,6 +1,8 @@
 <?php
 include_once __DIR__ . "/../../config/dbConnection.php";
 
+
+
 $success = $error = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];

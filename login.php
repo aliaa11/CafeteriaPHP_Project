@@ -30,15 +30,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Verify the password using password_verify
             if (password_verify($password, $user['password'])) {
-                // Password is correct, set session variables
-                $_SESSION["user_id"] = $user["id"]; // إضافة user_id
+                
+                $_SESSION["user_id"] = $user["id"]; 
                 $_SESSION["username"] = $user["username"];
                 $_SESSION["email"] = $user["email"];
                 $_SESSION["role"] = $user["role"];
 
                 // Redirect based on role
                 if ($user["role"] === "admin") {
-                    header("Location: admin_dashboard.php");
+                  
+                    header("Location: ./dashboard/index.php");
                 } else {
                     header("Location: home.php");
                 }

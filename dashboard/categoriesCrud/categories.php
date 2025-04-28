@@ -1,5 +1,8 @@
 <?php
 include_once __DIR__ . "/../../config/dbConnection.php";
+
+
+
 $success = $_GET['success'] ?? '';
 $error = $_GET['error'] ?? '';
 
