@@ -473,16 +473,15 @@ $cart_count = array_sum($_SESSION['cart']);
                                 $modal_total_price += $subtotal;
                         ?>
                             <div class="cart-item">
-                                <span><?php echo htmlspecialchars($item['name']); ?></span>
-                                <span><?php echo $quantity; ?> x <?php echo $item['price']; ?> EGP</span>
-                                <span class="fw-bold"><?php echo $subtotal; ?> EGP</span>
+                                <span><?php echo htmlspecialchars($item['name']); ?> </span>
+                              
                             </div>
                         <?php
                             }
                         }
                         ?>
                         <div class="total-price">
-                            Total: <?php echo number_format($modal_total_price, 2); ?> EGP
+                            Total: $<?php echo number_format($modal_total_price, 2); ?> 
                         </div>
 
                         <div class="mb-3">

@@ -448,7 +448,7 @@ if (isset($_SESSION['flash_message'])) {
                                 </td>
                                 <td><i class="far fa-clock me-2"></i><?= date('Y/m/d h:i A', strtotime($first_order['order_date'])) ?></td>
                                 <td><i class="fas fa-door-open me-2"></i><?= htmlspecialchars($first_order['room_number']) ?></td>
-                                <td><i class="fas fa-receipt me-2"></i><?= number_format($first_order['total_price'], 2) ?> EGP</td>
+                                <td><i class="fas fa-receipt me-2"></i>$ <?= number_format($first_order['total_price'], 2) ?></td>
                                 <td>
                                     <span class="status-badge status-<?= strtolower($first_order['status']) ?>">
                                         <?= ucfirst($first_order['status']) ?>
@@ -458,12 +458,7 @@ if (isset($_SESSION['flash_message'])) {
                                     <div class="d-flex justify-content-center">
                                         <form method="post" class="me-2">
                                             <input type="hidden" name="order_id" value="<?= $first_order['id'] ?>">
-                                            <select name="new_status" class="form-select form-select-sm">
-                                                <option value="pending" <?= $first_order['status'] == 'pending' ? 'selected' : '' ?>>Pending</option>
-                                                <option value="confirmed" <?= $first_order['status'] == 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
-                                                <option value="delivered" <?= $first_order['status'] == 'delivered' ? 'selected' : '' ?>>Delivered</option>
-                                                <option value="canceled" <?= $first_order['status'] == 'canceled' ? 'selected' : '' ?>>Canceled</option>
-                                            </select>
+                                          
                                         </form>
                                         <button type="submit" name="update_status" class="btn btn-sm btn-primary me-2"><i class="fas fa-save"></i></button>
                                         <a href="order_details.php?order_id=<?= $first_order['id'] ?>" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
