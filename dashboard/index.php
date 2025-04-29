@@ -63,9 +63,9 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link text-light" href="./orderCrud/orders.php" target="content-frame">Add Order</a>
-                <a class="nav-link text-light" href="./orderCrud/orders.php" target="content-frame">All Order</a>
+                <a class="nav-link text-light" href="./orderCrud/orders.php" target="content-frame">Confirmed Orders</a>
 
-                <a class="nav-link text-light" href="./orderStatusCrud/orders.php" target="content-frame">Confirmed Orders</a>
+                <a class="nav-link text-light" href="./orderStatusCrud/orders.php" target="content-frame">Latest Orders</a>
               </li>
             </ul>
           </div>

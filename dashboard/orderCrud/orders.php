@@ -1,3 +1,139 @@
+<?php
+session_start();
+include_once __DIR__ . "/../../config/dbConnection.php";
+
+// Initialize all variables at the top
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+$status_filter = isset($_GET['status']) ? $_GET['status'] : 'all';
+$current_page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$orders_per_page = 10;
+$grouped_orders = [];
+$total_orders = 0;
+$total_pages = 1;
+
+// Handle status update
+if (isset($_POST['update_status'])) {
+    $order_id = $_POST['order_id'];
+    $new_status = $_POST['new_status'];
+    
+    $update_stmt = mysqli_prepare($myConnection, "UPDATE orders SET status = ? WHERE id = ?");
+    mysqli_stmt_bind_param($update_stmt, 'si', $new_status, $order_id);
+    mysqli_stmt_execute($update_stmt);
+    
+    header("Location: ".$_SERVER['PHP_SELF']);
+    exit();
+}
+
+// Handle order deletion (only for pending orders)
+if (isset($_POST['delete_order'])) {
+    $order_id = $_POST['order_id'];
+    
+    // First check if order is pending
+    $check_stmt = mysqli_prepare($myConnection, "SELECT status FROM orders WHERE id = ?");
+    mysqli_stmt_bind_param($check_stmt, 'i', $order_id);
+    mysqli_stmt_execute($check_stmt);
+    $result = mysqli_stmt_get_result($check_stmt);
+    $order = mysqli_fetch_assoc($result);
+    
+    if ($order && $order['status'] == 'pending') {
+        // Delete order items first (due to foreign key constraint)
+        $delete_items_stmt = mysqli_prepare($myConnection, "DELETE FROM order_items WHERE order_id = ?");
+        mysqli_stmt_bind_param($delete_items_stmt, 'i', $order_id);
+        mysqli_stmt_execute($delete_items_stmt);
+        
+        // Then delete the order
+        $delete_order_stmt = mysqli_prepare($myConnection, "DELETE FROM orders WHERE id = ?");
+        mysqli_stmt_bind_param($delete_order_stmt, 'i', $order_id);
+        mysqli_stmt_execute($delete_order_stmt);
+    }
+    
+    header("Location: ".$_SERVER['PHP_SELF']);
+    exit();
+}
+
+$query = "SELECT o.id as order_id, o.order_date, o.status, 
+          u.id as user_id, u.username, u.email,
+          i.id as item_id, i.name as item_name, i.price,
+          oi.quantity
+          FROM orders o
+          JOIN users u ON o.user_id = u.id
+          JOIN order_items oi ON o.id = oi.order_id
+          JOIN items i ON oi.item_id = i.id";
+
+// Add conditions
+$conditions = [];
+$params = [];
+$types = '';
+
+if (!empty($search_query)) {
+    $conditions[] = "(u.username LIKE ? OR u.email LIKE ? OR i.name LIKE ?)";
+    $params[] = "%$search_query%";
+    $params[] = "%$search_query%";
+    $params[] = "%$search_query%";
+    $types .= 'sss';
+}
+
+if ($status_filter !== 'all') {
+    $conditions[] = "o.status = ?";
+    $params[] = $status_filter;
+    $types .= 's';
+}
+
+if (!empty($conditions)) {
+    $query .= " WHERE " . implode(" AND ", $conditions);
+}
+
+// Count total orders
+$count_query = "SELECT COUNT(DISTINCT temp.order_id) as total FROM ($query) as temp";
+$count_stmt = mysqli_prepare($myConnection, $count_query);
+
+if (!empty($params)) {
+    mysqli_stmt_bind_param($count_stmt, $types, ...$params);
+}
+
+mysqli_stmt_execute($count_stmt);
+$count_result = mysqli_stmt_get_result($count_stmt);
+$total_orders = mysqli_fetch_assoc($count_result)['total'];
+$total_pages = ceil($total_orders / $orders_per_page);
+
+// Add sorting and pagination
+$query .= " ORDER BY o.order_date DESC LIMIT ? OFFSET ?";
+$params[] = $orders_per_page;
+$params[] = ($current_page - 1) * $orders_per_page;
+$types .= 'ii';
+
+// Fetch orders
+$stmt = mysqli_prepare($myConnection, $query);
+if (!empty($params)) {
+    mysqli_stmt_bind_param($stmt, $types, ...$params);
+}
+mysqli_stmt_execute($stmt);
+$orders_result = mysqli_stmt_get_result($stmt);
+
+// Group orders by order ID
+$grouped_orders = [];
+while ($order = mysqli_fetch_assoc($orders_result)) {
+    if (!isset($grouped_orders[$order['order_id']])) {
+        $grouped_orders[$order['order_id']] = [
+            'order_id' => $order['order_id'],
+            'user_id' => $order['user_id'],
+            'username' => $order['username'],
+            'email' => $order['email'],
+            'order_date' => $order['order_date'],
+            'status' => $order['status'],
+            'items' => []
+        ];
+    }
+    $grouped_orders[$order['order_id']]['items'][] = [
+        'item_id' => $order['item_id'],
+        'item_name' => $order['item_name'],
+        'price' => $order['price'],
+        'quantity' => $order['quantity'],
+        'total_price' => $order['price'] * $order['quantity']
+    ];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,6 +233,7 @@
             color: var(--text-light);
             font-weight: 500;
             letter-spacing: 0.5px;
+            text-align: center;
         }
         
         .status-badge {
@@ -113,30 +250,44 @@
             border: 1px solid #f8a5c2;
         }
         
-        .status-completed {
-            background-color: #e8f7f0;
-            color: #218c74;
-            border: 1px solid #7bed9f;
+        .status-confirmed {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #90caf9;
+        }
+        
+        .status-out_for_delivery {
+            background-color: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffb74d;
+        }
+        
+        .status-delivered {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #81c784;
         }
         
         .status-cancelled {
             background-color: #ffebee;
-            color: #c0392b;
-            border: 1px solid #ff7675;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
         }
         
-        .action-btns { 
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .action-btns {
             white-space: nowrap;
-            min-width: 200px;
-        }
-        
-        .pagination .page-item.active .page-link {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .pagination .page-link {
-            color: var(--primary-color);
         }
         
         .animate-bounce {
@@ -159,32 +310,49 @@
             100% {transform: translateY(0px);}
         }
         
-        .alert-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            width: 350px;
+        .pulse {
+            animation: pulse 2s infinite;
         }
         
-        .alert {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border: none;
-            border-left: 4px solid;
+        @keyframes pulse {
+            0% {box-shadow: 0 0 0 0 rgba(106, 76, 147, 0.4);}
+            70% {box-shadow: 0 0 0 12px rgba(106, 76, 147, 0);}
+            100% {box-shadow: 0 0 0 0 rgba(106, 76, 147, 0);}
+        }
+        
+        .add-order-btn {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .add-order-btn:hover {
+            background-color: #e893b5;
+            border-color: #e893b5;
+            transform: translateY(-2px);
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .item-details {
+            background-color: rgba(249, 247, 247, 0.7);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 4px;
         }
     </style>
 </head>
 
 <body class="bg-light">
-
 <div class="container py-4 animate__animated animate__fadeIn">
     <div class="d-flex justify-content-between align-items-center mb-5">
-        <h2 class="header-title animate__animated animate__fadeInLeft">
-            <i class="fas fa-clipboard-list me-2"></i>Order Management
-        </h2>
+        <h2 class="header-title animate__animated animate__fadeInLeft"><i class="fas fa-clipboard-list me-2"></i>Order Management</h2>
         <div class="animate__animated animate__fadeInRight">
-            <a href="orders.php" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Orders
+            <a href="addorder-admin.php" class="btn add-order-btn">
+                <i class="fas fa-plus me-2"></i>Add Order
             </a>
         </div>
     </div>
@@ -193,30 +361,24 @@
     <div class="filter-card animate__animated animate__fadeInUp">
         <form method="GET" class="row g-3">
             <div class="col-md-6">
-                <label class="form-label fw-medium"><i class="fas fa-search me-2"></i>Search</label>
-                <input type="text" name="search" class="form-control" placeholder="Search by user or item..." value="<?= htmlspecialchars($search_query) ?>">
+                <label for="search" class="form-label fw-medium"><i class="fas fa-search me-2"></i>Search</label>
+                <input type="text" id="search" name="search" class="form-control" placeholder="Search by user or item..." value="<?= htmlspecialchars($search_query) ?>">
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-medium"><i class="fas fa-filter me-2"></i>Status</label>
+                <label for="status" class="form-label fw-medium"><i class="fas fa-filter me-2"></i>Status</label>
                 <select name="status" class="form-select">
                     <option value="all" <?= $status_filter === 'all' ? 'selected' : '' ?>>All Statuses</option>
                     <option value="pending" <?= $status_filter === 'pending' ? 'selected' : '' ?>>Pending</option>
-                    <option value="completed" <?= $status_filter === 'completed' ? 'selected' : '' ?>>Completed</option>
+                    <option value="confirmed" <?= $status_filter === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
+                    <option value="out_for_delivery" <?= $status_filter === 'out_for_delivery' ? 'selected' : '' ?>>Out for Delivery</option>
+                    <option value="delivered" <?= $status_filter === 'delivered' ? 'selected' : '' ?>>Delivered</option>
                     <option value="cancelled" <?= $status_filter === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-filter me-2"></i>Filter
-                </button>
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i>Filter</button>
             </div>
         </form>
-    </div>
-
-    <div class="d-grid gap-2 mt-2 mb-4" style="max-width:200px">
-        <a href="addorder-admin.php" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Add New Order
-        </a>
     </div>
 
     <div class="table-responsive animate__animated animate__fadeInUp">
@@ -224,13 +386,13 @@
             <thead>
                 <tr>
                     <th>Order ID</th>
-                    <th>Customer</th>
+                    <th>User</th>
                     <th>Email</th>
-                    <th>Date</th>
+                    <th>Order Date</th>
                     <th>Status</th>
                     <th>Items</th>
                     <th>Total</th>
-                    <th>Actions</th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -246,17 +408,17 @@
                             <td><?= $order['order_id'] ?></td>
                             <td><?= htmlspecialchars($order['username']) ?></td>
                             <td><?= htmlspecialchars($order['email']) ?></td>
-                            <td><?= date('Y/m/d', strtotime($order['order_date'])) ?></td>
+                            <td><?= date('Y-m-d H:i', strtotime($order['order_date'])) ?></td>
                             <td>
                                 <span class="status-badge status-<?= strtolower($order['status']) ?>">
-                                    <?= ucfirst($order['status']) ?>
+                                    <?= str_replace('_', ' ', ucfirst($order['status'])) ?>
                                 </span>
                             </td>
                             <td>
                                 <?php foreach ($order['items'] as $item): ?>
-                                    <div class="text-start mb-2">
+                                    <div class="item-details">
                                         <strong><?= htmlspecialchars($item['item_name']) ?></strong> 
-                                        (x<?= $item['quantity'] ?>)
+                                        (x<?= $item['quantity'] ?>) 
                                         <br>
                                         <small class="text-muted">
                                             $<?= number_format($item['price'], 2) ?> each 
@@ -268,7 +430,7 @@
                             <td>
                                 <strong>$<?= number_format($order_total_price, 2) ?></strong>
                             </td>
-                            <td class="action-btns">
+                            <td class="text-center">
                                 <div class="d-flex flex-column gap-2">
                                     <!-- Status Update Form -->
                                     <form method="POST" class="mb-2">
@@ -276,27 +438,29 @@
                                         <div class="input-group input-group-sm">
                                             <select name="new_status" class="form-select form-select-sm">
                                                 <option value="pending" <?= $order['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                                                <option value="completed" <?= $order['status'] === 'completed' ? 'selected' : '' ?>>Completed</option>
+                                                <option value="confirmed" <?= $order['status'] === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
+                                                <option value="out_for_delivery" <?= $order['status'] === 'out_for_delivery' ? 'selected' : '' ?>>Out for Delivery</option>
+                                                <option value="delivered" <?= $order['status'] === 'delivered' ? 'selected' : '' ?>>Delivered</option>
                                                 <option value="cancelled" <?= $order['status'] === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
                                             </select>
-                                            <button type="submit" name="update_status" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-sync-alt"></i>
+                                            <button type="submit" name="update_status" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-save"></i>
                                             </button>
                                         </div>
                                     </form>
                                     
                                     <!-- Edit Button -->
-                                    <a href="edit-order.php?order_id=<?= $order['order_id'] ?>" 
-                                       class="btn btn-sm btn-outline-success w-100">
-                                        <i class="fas fa-edit"></i> Edit Items
+                                    <a href="editoncustomizedo.php?order_id=<?= $order['order_id'] ?>" 
+                                       class="btn btn-sm btn-info">
+                                        <i class="fas fa-edit me-1"></i>Edit
                                     </a>
                                     
                                     <!-- Delete Button (only shown for pending orders) -->
                                     <?php if ($order['status'] === 'pending'): ?>
                                     <form method="POST" onsubmit="return confirm('Are you sure you want to delete this order?');">
                                         <input type="hidden" name="order_id" value="<?= $order['order_id'] ?>">
-                                        <button type="submit" name="delete_order" class="btn btn-sm btn-outline-danger w-100">
-                                            <i class="fas fa-trash-alt"></i> Delete
+                                        <button type="submit" name="delete_order" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash-alt me-1"></i>Delete
                                         </button>
                                     </form>
                                     <?php endif; ?>
