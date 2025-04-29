@@ -6,7 +6,7 @@ if (!$myConnection) {
 }
 
 if(isset($_GET['id'])) {
-    $product_id = intval($_GET['id']);
+    $product_id = $_GET['id'];
     
     $sql = "SELECT image_url FROM items WHERE id = $product_id";
     $result = mysqli_query($myConnection, $sql);

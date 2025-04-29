@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Custom variables */
 :root {
   --darkBg: #212529;
@@ -36,10 +37,61 @@ body {
 
 .nav-link:hover, .nav-link:focus {
   color: var(--darkText);
+=======
+/* Dashboard.css */
+.sidebar {
+
+  position: relative;
+  z-index: 100;
+
+}
+
+.sidebar-collapsed {
+  transform: translateX(-100%);
+}
+
+.toggle-btn {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .sidebar {
+      position: fixed;
+      top: 0;
+      width: 300px;
+      left: 0;
+      height: 100vh;
+      transform: translateX(0);
+      transition: transform 0.3s ease-in-out;
+  }
+  
+  .sidebar-collapsed {
+      transform: translateX(-100%);
+  }
+  
+  .toggle-btn {
+      display: block;
+  }
+  
+  .col-md-9.col-lg-10 {
+      margin-left: 0;
+      width: 100%;
+  }
+}
+
+.nav-link {
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin: 2px 5px;
+}
+
+.nav-link:hover {
+>>>>>>> origin/merging-branch
   background-color: rgba(255, 255, 255, 0.1);
 }
 
 .nav-link.active {
+<<<<<<< HEAD
   background-color: var(--primary);
   color: white;
 }
@@ -67,4 +119,12 @@ body {
 /* Iframe styling */
 iframe {
   background-color: white;
+=======
+  background-color: rgba(13, 110, 253, 0.5);
+}
+
+
+iframe {
+  min-height: calc(100vh - 0px);
+>>>>>>> origin/merging-branch
 }
