@@ -377,11 +377,6 @@ if (isset($_SESSION['flash_message'])) {
     <div class="container py-4 animate__animated animate__fadeIn">
         <div class="d-flex justify-content-between align-items-center mb-5">
             <h2 class="header-title animate__animated animate__fadeInLeft"><i class="fas fa-clipboard-list me-2"></i>Orders Management</h2>
-            <div class="animate__animated animate__fadeInRight">
-                <a href="#" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#helpModal">
-                    <i class="fas fa-question-circle me-2"></i>Help
-                </a>
-            </div>
         </div>
         
         <!-- Filter Card -->
@@ -448,7 +443,7 @@ if (isset($_SESSION['flash_message'])) {
                                 </td>
                                 <td><i class="far fa-clock me-2"></i><?= date('Y/m/d h:i A', strtotime($first_order['order_date'])) ?></td>
                                 <td><i class="fas fa-door-open me-2"></i><?= htmlspecialchars($first_order['room_number']) ?></td>
-                                <td><i class="fas fa-receipt me-2"></i><?= number_format($first_order['total_price'], 2) ?> EGP</td>
+                                <td><i class="fas fa-receipt me-2"></i>$ <?= number_format($first_order['total_price'], 2) ?></td>
                                 <td>
                                     <span class="status-badge status-<?= strtolower($first_order['status']) ?>">
                                         <?= ucfirst($first_order['status']) ?>
@@ -458,15 +453,8 @@ if (isset($_SESSION['flash_message'])) {
                                     <div class="d-flex justify-content-center">
                                         <form method="post" class="me-2">
                                             <input type="hidden" name="order_id" value="<?= $first_order['id'] ?>">
-                                            <select name="new_status" class="form-select form-select-sm">
-                                                <option value="pending" <?= $first_order['status'] == 'pending' ? 'selected' : '' ?>>Pending</option>
-                                                <option value="confirmed" <?= $first_order['status'] == 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
-                                                <option value="delivered" <?= $first_order['status'] == 'delivered' ? 'selected' : '' ?>>Delivered</option>
-                                                <option value="canceled" <?= $first_order['status'] == 'canceled' ? 'selected' : '' ?>>Canceled</option>
-                                            </select>
-                                        </form>
-                                        <button type="submit" name="update_status" class="btn btn-sm btn-primary me-2"><i class="fas fa-save"></i></button>
-                                        <a href="order_details.php?order_id=<?= $first_order['id'] ?>" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                           
+                                          <a href="order_details.php?order_id=<?= $first_order['id'] ?>" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -580,30 +568,6 @@ if (isset($_SESSION['flash_message'])) {
         </div>
     </div>
 
-    <!-- Help Modal -->
-    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="helpModalLabel"><i class="fas fa-question-circle me-2"></i>Help Center</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <h6><i class="fas fa-filter me-2"></i>Filtering Orders</h6>
-                    <p>Use the date range and search fields to filter orders by date or customer information.</p>
-                    
-                    <h6 class="mt-4"><i class="fas fa-sync-alt me-2"></i>Status Management</h6>
-                    <p>Update order status using the dropdown menu and save button for each order.</p>
-                    
-                    <h6 class="mt-4"><i class="fas fa-trash-alt me-2"></i>Database Cleanup</h6>
-                    <p>The cleanup button removes all completed orders from the system.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-check me-2"></i>Got it!</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -614,7 +578,7 @@ if (isset($_SESSION['flash_message'])) {
             const alert = document.createElement('div');
             alert.className = `alert alert-${'<?= $flash_message['type'] ?>'} show`;
             alert.innerHTML = `
-                <strong><i class="fas fa-${'<?= $flash_message['type'] === 'success' ? 'check' : 'exclamation' ?>'-circle me-2"></i>${'<?= ucfirst($flash_message['type']) ?>'}!</strong> 
+                <strong><i class="fas fa-${'<?= $flash_message['type'] === 'success' ? 'check' : 'exclamation' ?>-circle me-2'></i>${'<?= ucfirst($flash_message['type']) ?>'}!</strong> 
                 ${'<?= $flash_message['message'] ?>'}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             `;

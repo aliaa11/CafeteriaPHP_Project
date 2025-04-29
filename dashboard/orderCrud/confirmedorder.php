@@ -112,35 +112,248 @@ while ($order = mysqli_fetch_assoc($orders_result)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        /* ... (keep all your existing styles) ... */
+        :root {
+            --primary-color: #6a4c93;
+            --secondary-color: #8a5a44;
+            --accent-color: #f8a5c2;
+            --light-bg: #f9f7f7;
+            --card-bg: #ffffff;
+            --text-dark: #2d3436;
+            --text-light: #f5f6fa;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: linear-gradient(135deg, #f9f7f7 0%, #e8f4f8 100%);
+        }
+        
+        .header-title {
+            color: var(--primary-color);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        .header-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+        }
+        
+        .filter-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5a3d7a;
+            border-color: #5a3d7a;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-secondary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .table {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .table:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .table thead th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .status-pending {
+            background-color: #fff0f6;
+            color: #c44569;
+            border: 1px solid #f8a5c2;
+        }
+        
+        .status-confirmed {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #90caf9;
+        }
+        
+        .status-out_for_delivery {
+            background-color: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffb74d;
+        }
+        
+        .status-delivered {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #81c784;
+        }
+        
+        .status-canceled {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .action-btns {
+            white-space: nowrap;
+        }
+        
+        .animate-bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% {transform: translateY(0px);}
+            50% {transform: translateY(-8px);}
+            100% {transform: translateY(0px);}
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {box-shadow: 0 0 0 0 rgba(106, 76, 147, 0.4);}
+            70% {box-shadow: 0 0 0 12px rgba(106, 76, 147, 0);}
+            100% {box-shadow: 0 0 0 0 rgba(106, 76, 147, 0);}
+        }
+        
+        .add-order-btn {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .add-order-btn:hover {
+            background-color: #e893b5;
+            border-color: #e893b5;
+            transform: translateY(-2px);
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .item-details {
+            background-color: rgba(249, 247, 247, 0.7);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .search-btn {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .search-btn:hover {
+            background-color: #5a3d7a;
+            border-color: #5a3d7a;
+        }
     </style>
 </head>
 
 <body class="bg-light">
 <div class="container py-4 animate__animated animate__fadeIn">
     <div class="d-flex justify-content-between align-items-center mb-5">
-        <h2 class="header-title animate__animated animate__fadeInLeft"><i class="fas fa-clipboard-list me-2"></i>Active Orders</h2>
+        <h2 class="header-title animate__animated animate__fadeInLeft">
+            <i class="fas fa-clipboard-list me-2"></i>Active Orders
+        </h2>
         <div class="animate__animated animate__fadeInRight">
-            <a href="addorder-admin.php" class="btn add-order-btn">
-                <i class="fas fa-plus me-2"></i>Add Order
+            <a href="orders.php" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to All Orders
             </a>
         </div>
     </div>
 
-    <!-- Search Form (removed status filter) -->
+    <!-- Search Form -->
     <div class="filter-card animate__animated animate__fadeInUp">
         <form method="GET" class="row g-3">
             <div class="col-md-10">
-                <label for="search" class="form-label fw-medium"><i class="fas fa-search me-2"></i>Search</label>
+                <label for="search" class="form-label fw-medium">
+                    <i class="fas fa-search me-2"></i>Search
+                </label>
                 <div class="input-group">
-                    <input type="text" id="search" name="search" class="form-control" placeholder="Search by user or item..." value="<?= htmlspecialchars($search_query) ?>">
-                    <button class="btn btn-primary" type="submit">
+                    <input type="text" id="search" name="search" class="form-control" 
+                           placeholder="Search by user or item..." 
+                           value="<?= htmlspecialchars($search_query) ?>">
+                    <button class="btn search-btn text-white" type="submit">
                         <i class="fas fa-filter me-2"></i>Search
                     </button>
                 </div>
             </div>
             <div class="col-md-2 d-flex align-items-end">
-                <a href="orders.php" class="btn btn-outline-secondary w-100">
+                <a href="confirmedorder.php" class="btn btn-outline-secondary w-100">
                     <i class="fas fa-sync-alt me-2"></i>Reset
                 </a>
             </div>
@@ -201,23 +414,10 @@ while ($order = mysqli_fetch_assoc($orders_result)) {
                                     <!-- Status Update Form -->
                                     <form method="POST" class="mb-2">
                                         <input type="hidden" name="order_id" value="<?= $order['order_id'] ?>">
-                                        <div class="input-group input-group-sm">
-                                            <select name="new_status" class="form-select form-select-sm">
-                                                <option value="confirmed" <?= $order['status'] === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
-                                                <option value="out_for_delivery" <?= $order['status'] === 'out_for_delivery' ? 'selected' : '' ?>>Out for Delivery</option>
-                                                <option value="delivered" <?= $order['status'] === 'delivered' ? 'selected' : '' ?>>Delivered</option>
-                                            </select>
-                                            <button type="submit" name="update_status" class="btn btn-sm btn-primary">
-                                                <i class="fas fa-save"></i>
-                                            </button>
-                                        </div>
                                     </form>
                                     
                                     <!-- Edit Button -->
-                                    <a href="editoncustomizedo.php?order_id=<?= $order['order_id'] ?>" 
-                                       class="btn btn-sm btn-info">
-                                        <i class="fas fa-edit me-1"></i>Edit
-                                    </a>
+                                   
                                 </div>
                             </td>
                         </tr>
@@ -228,7 +428,7 @@ while ($order = mysqli_fetch_assoc($orders_result)) {
                             <div class="animate__animated animate__fadeIn">
                                 <i class="fas fa-clipboard-list fa-3x mb-3" style="color: var(--primary-color);"></i>
                                 <h4 class="text-muted">No active orders found</h4>
-                                <p class="text-muted">All confirmed/delivery/delivered orders are displayed here</p>
+                                <p class="text-muted">All confirmed/delivery/delivered orders will appear here</p>
                             </div>
                         </td>
                     </tr>

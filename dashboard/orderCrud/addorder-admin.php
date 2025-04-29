@@ -1,51 +1,41 @@
 <?php
 session_start();
 include_once __DIR__ . "/../../config/dbConnection.php";
+$usersList = mysqli_query($myConnection, "SELECT id, username FROM users ORDER BY username");
+$itemsList = mysqli_query($myConnection, "SELECT id, name, price FROM items ORDER BY name");
 
-// Fetch all users and products
-$users = mysqli_query($myConnection, "SELECT id, username FROM users ORDER BY username");
-$products = mysqli_query($myConnection, "SELECT id, name, price FROM items ORDER BY name");
-
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = (int)$_POST['user_id'];
-    $items = $_POST['items'];
-    $room_number = mysqli_real_escape_string($myConnection, $_POST['room_number']);
-    $status = 'pending'; // Default status for new orders
-    
-    // Start transaction
+    $uid = (int)$_POST['user_id'];
+    $selectedItems = $_POST['items'];
+    $room = mysqli_real_escape_string($myConnection, $_POST['room']);
+    $status = mysqli_real_escape_string($myConnection, $_POST['status']);
+
     mysqli_begin_transaction($myConnection);
-    
+
     try {
-        // 1. Create the order
-        $order_query = "INSERT INTO orders (user_id, room_number, status) VALUES (?, ?, ?)";
-        $stmt = mysqli_prepare($myConnection, $order_query);
-        mysqli_stmt_bind_param($stmt, "iss", $user_id, $room_number, $status);
+        $orderSQL = "INSERT INTO orders (user_id, room_number, status) VALUES (?, ?, ?)";
+        $stmt = mysqli_prepare($myConnection, $orderSQL);
+        mysqli_stmt_bind_param($stmt, "iss", $uid, $room, $status);
         mysqli_stmt_execute($stmt);
-        $order_id = mysqli_insert_id($myConnection);
-        
-        // 2. Add order items
-        foreach ($items as $item_id => $quantity) {
-            if ($quantity > 0) {
-                $item_query = "INSERT INTO order_items (order_id, item_id, quantity) VALUES (?, ?, ?)";
-                $stmt = mysqli_prepare($myConnection, $item_query);
-                mysqli_stmt_bind_param($stmt, "iii", $order_id, $item_id, $quantity);
+        $orderID = mysqli_insert_id($myConnection);
+
+        foreach ($selectedItems as $itemID => $qty) {
+            if ($qty > 0) {
+                $itemSQL = "INSERT INTO order_items (order_id, item_id, quantity) VALUES (?, ?, ?)";
+                $stmt = mysqli_prepare($myConnection, $itemSQL);
+                mysqli_stmt_bind_param($stmt, "iii", $orderID, $itemID, $qty);
                 mysqli_stmt_execute($stmt);
             }
         }
-        
-        // Commit transaction
+
         mysqli_commit($myConnection);
-        
         $_SESSION['flash_message'] = [
             'message' => 'Order created successfully!',
             'type' => 'success'
         ];
         header("Location: orders.php");
         exit();
-        
     } catch (Exception $e) {
-        // Rollback on error
         mysqli_rollback($myConnection);
         $_SESSION['flash_message'] = [
             'message' => 'Error creating order: ' . $e->getMessage(),
@@ -74,20 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --text-dark: #2d3436;
             --text-light: #f5f6fa;
         }
-        
         body {
             background-color: var(--light-bg);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-image: linear-gradient(135deg, #f9f7f7 0%, #e8f4f8 100%);
         }
-        
         .header-title {
             color: var(--primary-color);
             position: relative;
             display: inline-block;
             padding-bottom: 10px;
         }
-        
         .header-title:after {
             content: '';
             position: absolute;
@@ -98,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: var(--accent-color);
             border-radius: 3px;
         }
-        
         .card {
             background: var(--card-bg);
             border-radius: 12px;
@@ -106,34 +92,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: none;
             transition: all 0.3s ease;
         }
-        
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
-        
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
             transition: all 0.3s ease;
         }
-        
         .btn-primary:hover {
             background-color: #5a3d7a;
             border-color: #5a3d7a;
             transform: translateY(-2px);
         }
-        
         .btn-outline-secondary {
             color: var(--primary-color);
             border-color: var(--primary-color);
         }
-        
         .btn-outline-secondary:hover {
             background-color: var(--primary-color);
             color: white;
         }
-        
         .status-badge {
             padding: 6px 12px;
             border-radius: 50px;
@@ -141,13 +121,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 0.8rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
         .status-pending {
             background-color: #fff0f6;
             color: #c44569;
             border: 1px solid #f8a5c2;
         }
-        
         .product-card {
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -156,16 +134,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transition: all 0.3s ease;
             background-color: var(--card-bg);
         }
-        
         .product-card:hover {
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             transform: translateY(-3px);
         }
-        
         .quantity-control {
             width: 80px;
         }
-        
         .form-label {
             font-weight: 500;
             color: var(--primary-color);
@@ -184,54 +159,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </a>
             </div>
         </div>
-        
+
         <div class="card animate__animated animate__fadeInUp">
             <div class="card-body">
-                <form method="POST">
+                <form method="POST" class="needs-validation" novalidate>
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <label class="form-label"><i class="fas fa-user me-2"></i>Select Customer</label>
                             <select name="user_id" class="form-select" required>
                                 <option value="">-- Select Customer --</option>
-                                <?php while ($user = mysqli_fetch_assoc($users)): ?>
-                                    <option value="<?= $user['id'] ?>">
-                                        <?= htmlspecialchars($user['username']) ?> (ID: <?= $user['id'] ?>)
+                                <?php while ($u = mysqli_fetch_assoc($usersList)): ?>
+                                    <option value="<?= $u['id'] ?>">
+                                        <?= htmlspecialchars($u['username']) ?> (ID: <?= $u['id'] ?>)
                                     </option>
                                 <?php endwhile; ?>
                             </select>
+                            <div class="invalid-feedback">Please select a customer.</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label"><i class="fas fa-door-open me-2"></i>Room Number</label>
-                            <input type="text" name="room_number" class="form-control" required>
+                            <input type="text" name="room" class="form-control" required>
+                            <div class="invalid-feedback">Room number is required.</div>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label"><i class="fas fa-info-circle me-2"></i>Status</label>
-                            <div class="status-badge status-pending">
-                                Pending
-                            </div>
+                            <div class="status-badge status-pending">Pending</div>
                             <input type="hidden" name="status" value="pending">
                         </div>
                     </div>
-                    
+
                     <h4 class="mb-3" style="color: var(--primary-color);">
                         <i class="fas fa-utensils me-2"></i>Select Items
                     </h4>
-                    
+
                     <div class="row">
-                        <?php while ($product = mysqli_fetch_assoc($products)): ?>
+                        <?php while ($item = mysqli_fetch_assoc($itemsList)): ?>
                             <div class="col-md-4">
                                 <div class="product-card">
                                     <h5 style="color: var(--primary-color);">
-                                        <?= htmlspecialchars($product['name']) ?>
+                                        <?= htmlspecialchars($item['name']) ?>
                                     </h5>
                                     <p class="text-muted">
                                         <i class="fas fa-tag me-2"></i>
-                                        <?= number_format($product['price'], 2) ?> EGP
+                                        <?= number_format($item['price'], 2) ?> EGP
                                     </p>
                                     <div class="input-group">
                                         <span class="input-group-text">Qty:</span>
                                         <input type="number" 
-                                               name="items[<?= $product['id'] ?>]" 
+                                               name="items[<?= $item['id'] ?>]" 
                                                class="form-control quantity-control" 
                                                min="0" 
                                                value="0">
@@ -240,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         <?php endwhile; ?>
                     </div>
-                    
+
                     <div class="d-grid gap-2 mt-4">
                         <button type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-save me-2"></i>Create Order
@@ -252,5 +227,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (() => {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', e => {
+                    if (!form.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
 </body>
 </html>

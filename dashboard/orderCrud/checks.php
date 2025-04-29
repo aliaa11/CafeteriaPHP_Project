@@ -9,7 +9,6 @@ $date_to = isset($_GET['date_to']) ? $_GET['date_to'] : date('Y-m-t');
 $orders = [];
 $total_amount = 0;
 
-// Fetch user details if user_id is provided
 $user = null;
 if ($user_id > 0) {
     $user_query = "SELECT id, username, email FROM users WHERE id = ?";
@@ -20,7 +19,6 @@ if ($user_id > 0) {
     $user = mysqli_fetch_assoc($user_result);
 }
 
-// Fetch orders with items filtered by date and user_id
 $query = "SELECT o.id as order_id, o.order_date, o.status, o.room_number,
           u.username, u.email,
           i.name as item_name, i.price, oi.quantity,

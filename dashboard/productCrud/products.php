@@ -28,18 +28,18 @@
             --text-light: #f5f6fa;
         }
         .alert-warning {
-    border-left-color: #ffc107;
-}
+        border-left-color: #ffc107;
+        }
 
-.alert-dismissible .btn-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
+        .alert-dismissible .btn-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
 
-.alert p {
-    margin-bottom: 1rem;
-}
+        .alert p {
+            margin-bottom: 1rem;
+        }
         
         body {
             background-color: var(--light-bg);
@@ -252,11 +252,6 @@
     <div class="container py-4 animate__animated animate__fadeIn">
         <div class="d-flex justify-content-between align-items-center mb-5">
             <h2 class="header-title animate__animated animate__fadeInLeft"><i class="fas fa-boxes me-2"></i>Products Management</h2>
-            <div class="animate__animated animate__fadeInRight">
-                <a href="#" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#helpModal">
-                    <i class="fas fa-question-circle me-2"></i>Help
-                </a>
-            </div>
         </div>
         
         <!-- Search and Filter Card -->
@@ -281,7 +276,6 @@
             </form>
         </div>
         
-        <!-- Products Display -->
         <div class="row row-cols-1 row-cols-md-3 g-4 animate__animated animate__fadeInUp">
             <?php
             //=============================
@@ -452,30 +446,7 @@
         </div>
     </div>
     
-    <!-- Help Modal -->
-    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="helpModalLabel"><i class="fas fa-question-circle me-2"></i>Help Center</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <h6><i class="fas fa-search me-2"></i>Searching Products</h6>
-                    <p>Use the search bar to find products by name or category. You can switch between search modes using the dropdown.</p>
-                    
-                    <h6 class="mt-4"><i class="fas fa-plus-circle me-2"></i>Adding Products</h6>
-                    <p>Click the "Add Product" button to create new product entries. Fill in all required fields and upload an image if available.</p>
-                    
-                    <h6 class="mt-4"><i class="fas fa-edit me-2"></i>Editing Products</h6>
-                    <p>Use the Edit button on each product card to modify existing product information.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-check me-2"></i>Got it!</button>
-                </div>
-            </div>
-        </div>
-    </div>
+ 
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -507,43 +478,42 @@
                 card.style.animationDelay = `${index * 0.1}s`;
             });
         });
-        //////
         // Delete confirmation function
-function confirmDelete(productId, productName) {
-    // Create a Bootstrap alert dynamically
-    const container = document.getElementById('flashMessageContainer');
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-warning alert-dismissible fade show';
-    alertDiv.setAttribute('role', 'alert');
-    alertDiv.innerHTML = `
-        <strong><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</strong>
-        <p>Are you sure you want to delete "${productName}"?</p>
-        <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-sm btn-secondary me-2" onclick="dismissAlert(this)">
-                Cancel
-            </button>
-            <a href="delete_product.php?id=${productId}" class="btn btn-sm btn-danger">
-                <i class="fas fa-trash-alt me-1"></i> Delete
-            </a>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    
-    container.appendChild(alertDiv);
-    
-    // Auto-dismiss after 10 seconds if not interacted with
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
+        function confirmDelete(productId, productName) {
+            // Create a Bootstrap alert dynamically
+            const container = document.getElementById('flashMessageContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.innerHTML = `
+                <strong><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</strong>
+                <p>Are you sure you want to delete "${productName}"?</p>
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-secondary me-2" onclick="dismissAlert(this)">
+                        Cancel
+                    </button>
+                    <a href="delete_product.php?id=${productId}" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Delete
+                    </a>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            container.appendChild(alertDiv);
+            
+            // Auto-dismiss after 10 seconds if not interacted with
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    bootstrap.Alert.getInstance(alertDiv).close();
+                }
+            }, 10000);
+        }
+
+        // Function to dismiss alert
+        function dismissAlert(button) {
+            const alertDiv = button.closest('.alert');
             bootstrap.Alert.getInstance(alertDiv).close();
         }
-    }, 10000);
-}
-
-// Function to dismiss alert
-function dismissAlert(button) {
-    const alertDiv = button.closest('.alert');
-    bootstrap.Alert.getInstance(alertDiv).close();
-}
         // Delete modal handling
         document.addEventListener('DOMContentLoaded', function() {
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
@@ -604,8 +574,8 @@ if (isset($_POST['addProduct'])) {
         $file_name = $_FILES['image']['name'];
         $file_tmp = $_FILES['image']['tmp_name'];
         $file_size = $_FILES['image']['size'];
-        
-        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        $fileArray = explode(".", $file_name);
+        $file_ext = strtolower(end($fileArray)); 
         $allowed_ext = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         
         if (in_array($file_ext, $allowed_ext)) {

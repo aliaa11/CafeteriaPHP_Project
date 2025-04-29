@@ -1,6 +1,5 @@
 <?php
 include_once __DIR__ . "/../../config/dbConnection.php";
-
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
     $sql = "SELECT * FROM categories WHERE id = $id";

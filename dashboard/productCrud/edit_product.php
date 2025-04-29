@@ -36,7 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProduct'])) {
         $fileName = $_FILES['image']['name'];
         $fileTmp = $_FILES['image']['tmp_name'];
         $fileSize = $_FILES['image']['size'];
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $fileArray = explode(".", $fileName);
+      
+        $fileExt =  strtolower(end($fileArray)); 
         $allowedExt = ["png", "jpg", "gif", "svg", "jpeg", "webp"];
         
         if (in_array($fileExt, $allowedExt) && $fileSize < 5000000) {

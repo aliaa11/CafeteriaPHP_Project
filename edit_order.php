@@ -7,46 +7,71 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+$cart_count = array_sum($_SESSION['cart']);
+
+if (!isset($_GET['order_id']) || !is_numeric($_GET['order_id'])) {
     header("Location: my_orders.php");
     exit();
 }
 
-$order_id = $_POST['order_id'];
+$order_id = (int)$_GET['order_id'];
 $user_id = $_SESSION['user_id'];
-$room_number = $_POST['room_number'];
-$quantities = $_POST['quantities'];
 
-// Validate order belongs to user and is pending
-$check_query = "SELECT status FROM orders WHERE id = ? AND user_id = ?";
-$stmt = mysqli_prepare($myConnection, $check_query);
+$order_query = "SELECT o.*, u.username, 
+               (SELECT SUM(i.price * oi.quantity) 
+                FROM order_items oi 
+                JOIN items i ON oi.item_id = i.id 
+                WHERE oi.order_id = o.id) as total_price
+                FROM orders o
+                JOIN users u ON o.user_id = u.id
+                WHERE o.id = ? AND o.user_id = ?";
+$stmt = mysqli_prepare($myConnection, $order_query);
 mysqli_stmt_bind_param($stmt, "ii", $order_id, $user_id);
 mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$order = mysqli_fetch_assoc($result);
+$order_result = mysqli_stmt_get_result($stmt);
+$order = mysqli_fetch_assoc($order_result);
 
-if (!$order || $order['status'] !== 'pending') {
-    $_SESSION['error'] = "Order cannot be updated";
-    header("Location: order_details.php?order_id=" . $order_id);
+if (!$order) {
+    header("Location: my_orders.php");
     exit();
 }
 
-$update_query = "UPDATE orders SET room_number = ? WHERE id = ?";
-$stmt = mysqli_prepare($myConnection, $update_query);
-mysqli_stmt_bind_param($stmt, "si", $room_number, $order_id);
+$items_query = "SELECT i.*, oi.quantity 
+               FROM order_items oi
+               JOIN items i ON oi.item_id = i.id
+               WHERE oi.order_id = ?";
+$stmt = mysqli_prepare($myConnection, $items_query);
+mysqli_stmt_bind_param($stmt, "i", $order_id);
 mysqli_stmt_execute($stmt);
-
-foreach ($quantities as $item_id => $quantity) {
-    $quantity = (int)$quantity;
-    if ($quantity < 1) continue;
-    
-    $update_item_query = "UPDATE order_items SET quantity = ? WHERE order_id = ? AND item_id = ?";
-    $stmt = mysqli_prepare($myConnection, $update_item_query);
-    mysqli_stmt_bind_param($stmt, "iii", $quantity, $order_id, $item_id);
-    mysqli_stmt_execute($stmt);
-}
-
-$_SESSION['success'] = "Order updated successfully";
-header("Location: order_details.php?order_id=" . $order_id);
-exit();
+$items_result = mysqli_stmt_get_result($stmt);
+$items = mysqli_fetch_all($items_result, MYSQLI_ASSOC); 
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Luna Cafeteria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* Header Styles */
+        .navbar {
+            background-color: rgb(75, 49, 102);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #

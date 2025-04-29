@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+// Check if user is logged in and is an admin
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../404.php");
+    exit();
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -72,9 +82,9 @@
             </ul>
           </div>
           <div class="p-3">
-            <button id="logout" class="btn btn-outline-light w-100">
+            <a href="../logout.php" id="logout" class="btn btn-outline-light w-100">
               Log Out <i class="fa-solid fa-right-from-bracket ms-2"></i>
-            </button>
+            </a>
           </div>
         </div>
 

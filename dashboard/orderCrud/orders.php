@@ -2,7 +2,6 @@
 session_start();
 include_once __DIR__ . "/../../config/dbConnection.php";
 
-// Initialize all variables at the top
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 $status_filter = isset($_GET['status']) ? $_GET['status'] : 'all';
 $current_page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
@@ -11,7 +10,6 @@ $grouped_orders = [];
 $total_orders = 0;
 $total_pages = 1;
 
-// Handle status update
 if (isset($_POST['update_status'])) {
     $order_id = $_POST['order_id'];
     $new_status = $_POST['new_status'];
@@ -24,11 +22,9 @@ if (isset($_POST['update_status'])) {
     exit();
 }
 
-// Handle order deletion (only for pending orders)
 if (isset($_POST['delete_order'])) {
     $order_id = $_POST['order_id'];
     
-    // First check if order is pending
     $check_stmt = mysqli_prepare($myConnection, "SELECT status FROM orders WHERE id = ?");
     mysqli_stmt_bind_param($check_stmt, 'i', $order_id);
     mysqli_stmt_execute($check_stmt);
@@ -36,12 +32,10 @@ if (isset($_POST['delete_order'])) {
     $order = mysqli_fetch_assoc($result);
     
     if ($order && $order['status'] == 'pending') {
-        // Delete order items first (due to foreign key constraint)
-        $delete_items_stmt = mysqli_prepare($myConnection, "DELETE FROM order_items WHERE order_id = ?");
-        mysqli_stmt_bind_param($delete_items_stmt, 'i', $order_id);
-        mysqli_stmt_execute($delete_items_stmt);
+        $deleteis = mysqli_prepare($myConnection, "DELETE FROM order_items WHERE order_id = ?");
+        mysqli_stmt_bind_param($deleteis, 'i', $order_id);
+        mysqli_stmt_execute($deleteis);
         
-        // Then delete the order
         $delete_order_stmt = mysqli_prepare($myConnection, "DELETE FROM orders WHERE id = ?");
         mysqli_stmt_bind_param($delete_order_stmt, 'i', $order_id);
         mysqli_stmt_execute($delete_order_stmt);
@@ -60,7 +54,6 @@ $query = "SELECT o.id as order_id, o.order_date, o.status,
           JOIN order_items oi ON o.id = oi.order_id
           JOIN items i ON oi.item_id = i.id";
 
-// Add conditions
 $conditions = [];
 $params = [];
 $types = '';
@@ -83,7 +76,6 @@ if (!empty($conditions)) {
     $query .= " WHERE " . implode(" AND ", $conditions);
 }
 
-// Count total orders
 $count_query = "SELECT COUNT(DISTINCT temp.order_id) as total FROM ($query) as temp";
 $count_stmt = mysqli_prepare($myConnection, $count_query);
 
@@ -96,13 +88,11 @@ $count_result = mysqli_stmt_get_result($count_stmt);
 $total_orders = mysqli_fetch_assoc($count_result)['total'];
 $total_pages = ceil($total_orders / $orders_per_page);
 
-// Add sorting and pagination
 $query .= " ORDER BY o.order_date DESC LIMIT ? OFFSET ?";
 $params[] = $orders_per_page;
 $params[] = ($current_page - 1) * $orders_per_page;
 $types .= 'ii';
 
-// Fetch orders
 $stmt = mysqli_prepare($myConnection, $query);
 if (!empty($params)) {
     mysqli_stmt_bind_param($stmt, $types, ...$params);
@@ -110,7 +100,6 @@ if (!empty($params)) {
 mysqli_stmt_execute($stmt);
 $orders_result = mysqli_stmt_get_result($stmt);
 
-// Group orders by order ID
 $grouped_orders = [];
 while ($order = mysqli_fetch_assoc($orders_result)) {
     if (!isset($grouped_orders[$order['order_id']])) {
@@ -131,6 +120,28 @@ while ($order = mysqli_fetch_assoc($orders_result)) {
         'quantity' => $order['quantity'],
         'total_price' => $order['price'] * $order['quantity']
     ];
+}
+if (isset($_POST['delete_order'])) {
+    $order_id = $_POST['order_id'];
+    
+    $check_stmt = mysqli_prepare($myConnection, "SELECT status FROM orders WHERE id = ?");
+    mysqli_stmt_bind_param($check_stmt, 'i', $order_id);
+    mysqli_stmt_execute($check_stmt);
+    $result = mysqli_stmt_get_result($check_stmt);
+    $order = mysqli_fetch_assoc($result);
+    
+    if ($order && $order['status'] == 'pending') {
+        $deleteis = mysqli_prepare($myConnection, "DELETE FROM order_items WHERE order_id = ?");
+        mysqli_stmt_bind_param($deleteis, 'i', $order_id);
+        mysqli_stmt_execute($deleteis);
+        
+        $delete_order_stmt = mysqli_prepare($myConnection, "DELETE FROM orders WHERE id = ?");
+        mysqli_stmt_bind_param($delete_order_stmt, 'i', $order_id);
+        mysqli_stmt_execute($delete_order_stmt);
+    }
+    
+    header("Location: ".$_SERVER['PHP_SELF']);
+    exit();
 }
 ?>
 
@@ -356,8 +367,6 @@ while ($order = mysqli_fetch_assoc($orders_result)) {
             </a>
         </div>
     </div>
-
-    <!-- Search and Filter Form -->
     <div class="filter-card animate__animated animate__fadeInUp">
         <form method="GET" class="row g-3">
             <div class="col-md-6">
@@ -450,19 +459,20 @@ while ($order = mysqli_fetch_assoc($orders_result)) {
                                     </form>
                                     
                                     <!-- Edit Button -->
-                                    <a href="editoncustomizedo.php?order_id=<?= $order['order_id'] ?>" 
+                                    <a href="./editoncustomizedo.php?order_id=<?= $order['order_id'] ?>" 
+
                                        class="btn btn-sm btn-info">
                                         <i class="fas fa-edit me-1"></i>Edit
                                     </a>
                                     
                                     <!-- Delete Button (only shown for pending orders) -->
                                     <?php if ($order['status'] === 'pending'): ?>
-                                    <form method="POST" onsubmit="return confirm('Are you sure you want to delete this order?');">
-                                        <input type="hidden" name="order_id" value="<?= $order['order_id'] ?>">
-                                        <button type="submit" name="delete_order" class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash-alt me-1"></i>Delete
-                                        </button>
-                                    </form>
+                                        <form method="POST" >
+                                            <input type="hidden" name="order_id" value="<?= $order['order_id'] ?>">
+                                            <button type="submit" name="delete_order" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash-alt me-1"></i>Delete
+                                            </button>
+                                        </form>
                                     <?php endif; ?>
                                 </div>
                             </td>
